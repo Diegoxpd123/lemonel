@@ -207,3 +207,83 @@ button {
 .btn .icon {
   font-size: 1.25em;
 }
+
+.calc select,
+.calc input[type='text'],
+.calc input[type='date'],
+.calc input[type='number'],
+.field select,
+.field input,
+.field textarea {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  min-height: 58px;
+  padding: 0 18px;
+  border: 2px solid rgba(35, 42, 23, 0.14);
+  border-radius: 14px;
+  background-color: #fff;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 550;
+  color-scheme: light;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.calc select:hover,
+.calc input:hover,
+.field select:hover,
+.field input:hover,
+.field textarea:hover {
+  border-color: rgba(74, 85, 51, 0.55);
+}
+
+.calc select:focus,
+.calc input:focus,
+.field select:focus,
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--olive-deep);
+  box-shadow: 0 0 0 4px rgba(201, 162, 74, 0.38);
+}
+
+.calc select,
+.field select {
+  padding-right: 52px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%234a5533'><path d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  background-size: 18px;
+  cursor: pointer;
+}
+
+.calc input[type='date'],
+.field input[type='date'] {
+  cursor: pointer;
+}
+
+.calc input[type='date']::-webkit-calendar-picker-indicator,
+.field input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.65;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.calc input::placeholder,
+.field textarea::placeholder {
+  color: rgba(35, 42, 23, 0.45);
+  font-weight: 450;
+}
+
+.field textarea {
+  min-height: 92px;
+  padding: 14px 18px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.campo-base {
+  display: none;
+}
