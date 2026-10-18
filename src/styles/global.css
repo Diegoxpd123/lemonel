@@ -1,20 +1,26 @@
 :root {
-  --olive: #67744a;
-  --olive-deep: #4a5533;
-  --olive-night: #333b22;
-  --ink: #232a17;
-  --cream: #faf6ea;
-  --cream-2: #f2ebd5;
-  --sage: #bccb94;
-  --blush: #f4c9be;
-  --lilac: #d3bcf0;
-  --sand: #f1da94;
-  --deep: #4a5533;
-  --gold: #c9a24a;
-  --plum: #6a4c93;
-  --wine: #8f3e52;
-  --forest: #2f6a4a;
-  --amber: #8d6420;
+  --olive: #c8693f;
+  --olive-deep: #a85232;
+  --olive-night: #8f4326;
+  --ink: #3f2a1e;
+  --cream: #fbf1e2;
+  --cream-2: #f3e3cb;
+  --sage: #e8cba0;
+  --blush: #f7b891;
+  --lilac: #f4a383;
+  --sand: #f6dda6;
+  --deep: #a85232;
+  --gold: #e9aa4c;
+  --plum: #f4a383;
+  --wine: #f7b891;
+  --forest: #e8cba0;
+  --amber: #f0c070;
+  --arena: #ead3b1;
+  --terracota: #c8693f;
+  --terracota-dk: #a85232;
+  --coral: #e4694a;
+  --camel: #c9803f;
+  --oliva-suave: #8c8856;
   --font-display: 'Fraunces Variable', 'Georgia', serif;
   --font-text: 'DM Sans Variable', system-ui, sans-serif;
   --gutter: clamp(12px, 1.8vw, 28px);
@@ -220,7 +226,7 @@ button {
   width: 100%;
   min-height: 58px;
   padding: 0 18px;
-  border: 2px solid rgba(35, 42, 23, 0.14);
+  border: 2px solid rgba(63, 42, 30, 0.14);
   border-radius: 14px;
   background-color: #fff;
   color: var(--ink);
@@ -273,7 +279,7 @@ button {
 
 .calc input::placeholder,
 .field textarea::placeholder {
-  color: rgba(35, 42, 23, 0.45);
+  color: rgba(63, 42, 30, 0.45);
   font-weight: 450;
 }
 

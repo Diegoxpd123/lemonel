@@ -23,7 +23,7 @@ export function initHero() {
 
   const rows = Array.from(hero.querySelectorAll('[data-hero-row]')) as HTMLElement[]
   const color = (i: number) => getComputedStyle(document.documentElement).getPropertyValue('--' + (imgs[i].dataset.tone ?? 'sand')).trim()
-  const disco = (i: number) => (imgs[i].dataset.disc === 'oscuro' ? 'rgba(24, 31, 14, 0.58)' : '#fffdf5')
+  const disco = (i: number) => (imgs[i].dataset.disc === 'oscuro' ? 'rgba(63, 42, 30, 0.58)' : '#fffdf5')
   const items = imgs.map((img) => productos.find((p) => p.id === img.dataset.slide)!)
   let cur = 0
   let idle: gsap.core.Tween | null = null
