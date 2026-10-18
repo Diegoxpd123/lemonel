@@ -1,0 +1,418 @@
+---
+import Icon from './Icon.astro'
+import { productos } from '../data/products'
+import { config, escalas } from '../data/config'
+---
+
+<section class="evt" id="eventos" data-evento>
+  <div class="evt__intro wrap">
+    <h2 data-reveal>Que tu evento deje un lindo recuerdo</h2>
+    <blockquote class="evt__proof" data-reveal>
+      <p>70 collares de cruz para una misa, cada uno en su cajita y en un solo pedido.</p>
+    </blockquote>
+  </div>
+
+  <ul class="tiers wrap" aria-label="Descuento por cantidad" data-reveal>
+    {escalas.map((e) => (
+      <li class="tier" data-tier={e.desde}>
+        <span class="tier__n">{e.desde}<small>+</small></span>
+        <span class="tier__l">piezas iguales</span>
+        <strong class="tier__d">{Math.round(e.descuento * 100)}% menos</strong>
+      </li>
+    ))}
+  </ul>
+
+  <div class="evt__body wrap">
+    <div class="evt__collage" data-reveal>
+      <img src="/fotos/evento-cajas.webp" alt="Pulseras de perlas en sus cajitas individuales" width="900" height="1125" loading="lazy" decoding="async" />
+      <img src="/fotos/collar-cruz.webp" alt="Collar dorado con cruz larga" width="900" height="1125" loading="lazy" decoding="async" />
+      <p class="evt__cap">
+        <Icon name="gift" weight="regular" />
+        Cada pieza va en su cajita, lista para entregar.
+      </p>
+    </div>
+
+    <form class="calc" data-calc data-reveal novalidate>
+      <h3 class="calc__title">Calcula tu pedido</h3>
+
+      <div class="calc__row">
+        <label for="calc-pieza">Pieza</label>
+        <select id="calc-pieza" name="pieza" data-calc-pieza>
+          {productos.map((p) => (
+            <option value={p.id} selected={p.id === 'collar-cruz'}>{p.nombre} — {config.moneda} {p.precio}</option>
+          ))}
+        </select>
+      </div>
+
+      <div class="calc__row">
+        <span class="calc__label" id="calc-cant-l">Cantidad</span>
+        <div class="calc__qty">
+          <button type="button" class="step" data-calc-menos aria-label="Una menos"><Icon name="minus" weight="bold" /></button>
+          <input id="calc-cant" name="cantidad" type="number" inputmode="numeric" min="1" value="70" aria-labelledby="calc-cant-l" data-calc-cant />
+          <button type="button" class="step" data-calc-mas aria-label="Una más"><Icon name="plus" weight="bold" /></button>
+        </div>
+        <div class="calc__presets" role="group" aria-label="Cantidades frecuentes">
+          {[10, 30, 50, 70, 100].map((n) => (
+            <button type="button" class="chip--sm" data-calc-preset={n} aria-pressed="false">{n}</button>
+          ))}
+        </div>
+      </div>
+
+      <div class="calc__result" aria-live="polite">
+        <div>
+          <span>Cada una</span>
+          <strong data-calc-unit></strong>
+          <s data-calc-old></s>
+        </div>
+        <div>
+          <span>Total</span>
+          <strong class="calc__total" data-calc-total></strong>
+          <em data-calc-save></em>
+        </div>
+      </div>
+
+      <div class="calc__grid">
+        <div class="calc__row">
+          <label for="calc-tipo">Tipo de evento</label>
+          <select id="calc-tipo" name="tipo" data-calc-tipo>
+            <option>Misa</option>
+            <option>Bautizo</option>
+            <option>Primera comunión</option>
+            <option>Matrimonio</option>
+            <option>Cumpleaños</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="calc__row">
+          <label for="calc-fecha">Fecha del evento</label>
+          <input id="calc-fecha" name="fecha" type="date" data-calc-fecha />
+        </div>
+      </div>
+
+      <div class="calc__row">
+        <label for="calc-nota">Personalización</label>
+        <input id="calc-nota" name="nota" type="text" placeholder="Nombre en la tarjeta, color del lazo…" data-calc-nota />
+      </div>
+
+      <p class="calc__error" data-calc-error role="alert" hidden></p>
+
+      <button class="btn btn--gold calc__send" type="submit">
+        <Icon name="whatsapp-logo" weight="regular" />
+        Pedir para mi evento por WhatsApp
+      </button>
+    </form>
+  </div>
+</section>
+
+<style>
+  .evt {
+    padding-block: var(--section);
+    background: var(--plum);
+    color: #fffdf5;
+  }
+
+  .evt__intro {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    align-items: end;
+    gap: 32px 64px;
+  }
+
+  .evt__intro h2 {
+    font-size: clamp(2.7rem, 7.2vw, 7.8rem);
+  }
+
+  .evt__proof {
+    margin: 0;
+    padding-bottom: 0.7em;
+  }
+
+  .evt__proof p {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 48;
+    font-size: clamp(1.4rem, 2vw, 1.9rem);
+    font-weight: 480;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+  }
+
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: clamp(18px, 2.6vw, 32px) 0 8px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tier {
+    display: grid;
+    gap: 2px;
+    padding: clamp(16px, 2vw, 28px);
+    background: var(--cream);
+    color: var(--ink);
+    transition: background-color 0.35s ease, transform 0.5s var(--ease);
+  }
+
+  .tier[data-active='true'] {
+    background: var(--gold);
+    transform: translateY(-6px);
+  }
+
+  .tier__n {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+    font-size: clamp(2.6rem, 5vw, 5rem);
+    font-weight: 640;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+  }
+
+  .tier__n small {
+    font-size: 0.55em;
+    margin-left: 2px;
+  }
+
+  .tier__l {
+    font-size: 1rem;
+  }
+
+  .tier__d {
+    margin-top: 8px;
+    font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+    font-weight: 700;
+  }
+
+  .evt__body {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .evt__collage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 10px;
+  }
+
+  .evt__collage img {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  .evt__collage img:nth-of-type(2) {
+    object-position: 50% 78%;
+  }
+
+  .evt__cap {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 22px;
+    background: var(--olive-deep);
+    color: var(--cream);
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+
+  .evt__cap :global(.icon) {
+    font-size: 1.7rem;
+    color: var(--gold);
+  }
+
+  .calc {
+    display: grid;
+    gap: 22px;
+    align-content: start;
+    padding: clamp(22px, 3vw, 44px);
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  .calc__title {
+    font-size: clamp(1.8rem, 2.6vw, 2.5rem);
+    line-height: 1;
+  }
+
+  .calc__row {
+    display: grid;
+    gap: 8px;
+  }
+
+  .calc label,
+  .calc__label {
+    font-weight: 650;
+    font-size: 1.02rem;
+  }
+
+  .calc select,
+  .calc input[type='text'],
+  .calc input[type='date'],
+  .calc input[type='number'] {
+    width: 100%;
+    min-height: 56px;
+    padding: 0 16px;
+    border: 2px solid var(--ink);
+    border-radius: 0;
+    background: #fffdf5;
+    font-size: 1.08rem;
+  }
+
+  .calc__qty {
+    display: grid;
+    grid-template-columns: 58px 1fr 58px;
+  }
+
+  .calc__qty input {
+    text-align: center;
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 72;
+    font-size: 1.9rem !important;
+    font-weight: 640;
+    border-inline: 0 !important;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .calc__qty input::-webkit-outer-spin-button,
+  .calc__qty input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .step {
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--ink);
+    background: var(--olive-deep);
+    color: var(--cream);
+    font-size: 1.4rem;
+    transition: background-color 0.25s ease;
+  }
+
+  .step:hover {
+    background: var(--olive-night);
+  }
+
+  .calc__presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip--sm {
+    min-height: 46px;
+    min-width: 58px;
+    padding: 0 1em;
+    border: 0;
+    border-radius: 999px;
+    background: var(--cream-2);
+    font-weight: 700;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  .chip--sm:hover,
+  .chip--sm[aria-pressed='true'] {
+    background: var(--olive-deep);
+    color: var(--cream);
+  }
+
+  .calc__result {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: clamp(18px, 2.4vw, 30px);
+    background: var(--olive-deep);
+    color: var(--cream);
+  }
+
+  .calc__result > div {
+    display: grid;
+    gap: 2px;
+    align-content: start;
+  }
+
+  .calc__result span {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .calc__result strong {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 640;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .calc__total {
+    color: var(--gold);
+  }
+
+  .calc__result s {
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+
+  .calc__result em {
+    font-style: normal;
+    font-weight: 650;
+    font-size: 1rem;
+  }
+
+  .calc__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .calc__error {
+    padding: 12px 16px;
+    background: #f2cfc4;
+    font-weight: 650;
+  }
+
+  .calc__error[hidden] {
+    display: none;
+  }
+
+  .calc__send {
+    width: 100%;
+  }
+
+  .calc__send :global(.icon) {
+    font-size: 1.4rem;
+  }
+
+  @media (max-width: 900px) {
+    .evt__intro,
+    .evt__body {
+      grid-template-columns: 1fr;
+    }
+
+    .tiers {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .evt__collage {
+      grid-template-rows: auto auto;
+    }
+
+    .evt__collage img {
+      aspect-ratio: 4 / 5;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .calc__grid,
+    .calc__result {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

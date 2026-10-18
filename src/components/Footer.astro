@@ -1,0 +1,116 @@
+---
+import Icon from './Icon.astro'
+import { config } from '../data/config'
+
+const wa = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent('Hola Lemonel, quiero hacerles una consulta.')}`
+---
+
+<footer class="foot">
+  <div class="foot__cta wrap">
+    <p class="foot__lead" data-reveal>¿Lista para armar tu caja?</p>
+    <div class="foot__actions" data-reveal>
+      <a class="btn btn--cream" href="#catalogo">Ver catálogo<Icon name="arrow-right" weight="bold" /></a>
+      <a class="btn btn--ghost" href={wa} target="_blank" rel="noopener"><Icon name="whatsapp-logo" weight="regular" />Escríbenos por WhatsApp</a>
+    </div>
+  </div>
+
+  <div class="foot__links wrap">
+    <a href={config.instagram} target="_blank" rel="noopener"><Icon name="instagram-logo" weight="regular" />Instagram</a>
+    <a href={config.tiktok} target="_blank" rel="noopener"><Icon name="tiktok-logo" weight="regular" />TikTok</a>
+    <a href={wa} target="_blank" rel="noopener"><Icon name="whatsapp-logo" weight="regular" />WhatsApp</a>
+    <span><Icon name="truck" weight="regular" />Envíos a todo el Perú</span>
+  </div>
+
+  <div class="foot__name" data-foot-name aria-hidden="true">
+    <span>Lemonel</span>
+  </div>
+
+  <p class="foot__legal wrap">© {new Date().getFullYear()} Lemonel · {config.web}</p>
+</footer>
+
+<style>
+  .foot {
+    padding-top: clamp(36px, 4.6vw, 64px);
+    background: var(--olive);
+    color: var(--cream);
+    overflow: hidden;
+  }
+
+  .foot__cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .foot__lead {
+    max-width: 12ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+    font-size: clamp(2.6rem, 7vw, 7.6rem);
+    font-weight: 640;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+    text-wrap: balance;
+  }
+
+  .foot__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .foot__actions .btn--ghost:hover {
+    background: var(--cream);
+    color: var(--olive-night);
+  }
+
+  .foot__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 36px;
+    margin-top: clamp(24px, 3vw, 40px);
+    font-weight: 600;
+  }
+
+  .foot__links a,
+  .foot__links span {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+  }
+
+  .foot__links :global(.icon) {
+    font-size: 1.5rem;
+  }
+
+  .foot__links a:hover {
+    color: var(--gold);
+  }
+
+  .foot__name {
+    margin-top: clamp(12px, 2vw, 28px);
+    padding-inline: var(--gutter);
+    overflow: hidden;
+  }
+
+  .foot__name span {
+    display: block;
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+    font-size: 27.4vw;
+    font-weight: 640;
+    letter-spacing: -0.05em;
+    line-height: 0.82;
+    color: var(--olive-deep);
+    white-space: nowrap;
+    will-change: transform;
+  }
+
+  .foot__legal {
+    padding-block: 18px 28px;
+    font-size: 0.95rem;
+  }
+</style>

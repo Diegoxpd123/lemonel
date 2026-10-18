@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Header from '../components/Header.astro'
+import Hero from '../components/Hero.astro'
+import Cinta from '../components/Cinta.astro'
+import Tira from '../components/Tira.astro'
+import Catalogo from '../components/Catalogo.astro'
+import Colecciones from '../components/Colecciones.astro'
+import Galeria from '../components/Galeria.astro'
+import Evento from '../components/Evento.astro'
+import Entrega from '../components/Entrega.astro'
+import Faq from '../components/Faq.astro'
+import Footer from '../components/Footer.astro'
+import Caja from '../components/Caja.astro'
+---
+
+<Layout title="Lemonel · Joyas que llegan como un regalo" description="Collares, pulseras, aretes y relojes de Lemonel en su cajita con lazo. Arma tu caja y pide por WhatsApp. Pedidos para eventos, envíos a todo el Perú.">
+  <Header />
+  <main>
+    <Hero />
+    <Cinta />
+    <Tira />
+    <Catalogo />
+    <Colecciones />
+    <Galeria />
+    <Evento />
+    <Entrega />
+    <Tira desfase={9} fondo="var(--blush)" />
+    <Faq />
+  </main>
+  <Footer />
+  <Caja />
+  <script>
+    import '../scripts/main.ts'
+  </script>
+</Layout>

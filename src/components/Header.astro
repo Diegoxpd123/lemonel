@@ -1,0 +1,333 @@
+---
+import Icon from './Icon.astro'
+import { config } from '../data/config'
+
+const links = [
+  { href: '#catalogo', texto: 'Catálogo' },
+  { href: '#colecciones', texto: 'Colecciones' },
+  { href: '#eventos', texto: 'Eventos' },
+  { href: '#entrega', texto: 'Cómo llega' },
+  { href: '#preguntas', texto: 'Preguntas' },
+]
+---
+
+<div class="chrome" data-chrome>
+  <div class="aviso">
+    <p>
+      <Icon name="truck" weight="regular" />
+      <span>Envíos a todo el Perú</span>
+      <i aria-hidden="true"></i>
+      <span class="aviso__ev">Pedidos para eventos con {config.diasAnticipacion} días de anticipación</span>
+    </p>
+  </div>
+
+  <header class="head" data-header>
+    <a class="head__logo" href="#inicio" aria-label="Lemonel, inicio">
+      <img src="/logo.webp" alt="Lemonel" width="56" height="56" />
+    </a>
+
+    <nav class="head__nav" aria-label="Principal">
+      {links.map((l) => (
+        <a class="roll" href={l.href}>
+          <span data-t={l.texto}>{l.texto}</span>
+        </a>
+      ))}
+    </nav>
+
+    <button class="head__caja" type="button" data-abrir-caja>
+      <Icon name="gift" weight="regular" />
+      <span>Mi caja</span>
+      <span class="head__count" data-count>0</span>
+    </button>
+
+    <button class="head__burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu" data-burger>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+</div>
+
+<div class="menu" id="menu" data-menu hidden>
+  <nav aria-label="Menú móvil">
+    {links.map((l) => <a href={l.href} data-menu-link>{l.texto}</a>)}
+  </nav>
+  <div class="menu__foot">
+    <button class="btn btn--cream" type="button" data-abrir-caja>
+      <Icon name="gift" weight="regular" />
+      Abrir mi caja
+    </button>
+    <div class="menu__social">
+      <a href={config.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram-logo" weight="regular" /></a>
+      <a href={config.tiktok} target="_blank" rel="noopener" aria-label="TikTok"><Icon name="tiktok-logo" weight="regular" /></a>
+      <a href={`https://wa.me/${config.whatsapp}`} target="_blank" rel="noopener" aria-label="WhatsApp"><Icon name="whatsapp-logo" weight="regular" /></a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .chrome {
+    --aviso-h: 38px;
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 60;
+    transition: transform 0.55s var(--ease);
+  }
+
+  .chrome[data-compact='true'] {
+    transform: translateY(calc(var(--aviso-h) * -1));
+  }
+
+  .aviso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--aviso-h);
+    padding-inline: var(--gutter);
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+
+  .aviso p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+
+  .aviso :global(.icon) {
+    font-size: 1.25rem;
+  }
+
+  .aviso i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 76px;
+    padding: 0 var(--gutter);
+    color: #fffdf5;
+    background: transparent;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+
+  .head[data-state='solid'] {
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  .head__logo {
+    display: block;
+    flex: none;
+  }
+
+  .head__logo img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .head__nav {
+    display: flex;
+    gap: clamp(22px, 3vw, 46px);
+    margin-right: auto;
+    margin-left: clamp(12px, 3vw, 56px);
+  }
+
+  .roll {
+    display: block;
+    height: 1.5em;
+    overflow: hidden;
+    font-weight: 600;
+    font-size: 1.02rem;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .roll span {
+    display: block;
+    transition: transform 0.5s var(--ease);
+  }
+
+  .roll span::after {
+    content: attr(data-t);
+    display: block;
+    color: var(--gold);
+  }
+
+  .head[data-state='solid'] .roll span::after {
+    color: var(--olive);
+  }
+
+  .roll:hover span,
+  .roll:focus-visible span {
+    transform: translateY(-50%);
+  }
+
+  .head__caja {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 50px;
+    padding: 0 8px 0 20px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--cream);
+    color: var(--olive-night);
+    font-weight: 700;
+    font-size: 1.02rem;
+    transition: transform 0.4s var(--ease), background-color 0.3s ease;
+  }
+
+  .head__caja :global(.icon) {
+    font-size: 1.5rem;
+  }
+
+  .head[data-state='solid'] .head__caja {
+    background: var(--olive-deep);
+    color: var(--cream);
+  }
+
+  .head__caja:hover {
+    transform: translateY(-2px);
+  }
+
+  .head__count {
+    display: grid;
+    place-items: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 0.98rem;
+  }
+
+  .head__burger {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 68px;
+    height: 68px;
+    margin-top: -34px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+  }
+
+  .head__burger span {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    height: 2.5px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.4s var(--ease);
+  }
+
+  .head__burger span:nth-child(1) {
+    top: 28px;
+  }
+
+  .head__burger span:nth-child(2) {
+    top: 39px;
+  }
+
+  .head__burger[aria-expanded='true'] span:nth-child(1) {
+    transform: translateY(5.5px) rotate(45deg);
+  }
+
+  .head__burger[aria-expanded='true'] span:nth-child(2) {
+    transform: translateY(-5.5px) rotate(-45deg);
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 44px;
+    padding: 130px var(--gutter) 48px;
+    background: var(--olive-night);
+    color: var(--cream);
+  }
+
+  .menu[hidden] {
+    display: none;
+  }
+
+  .menu nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .menu nav a {
+    padding: 6px 0;
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+    font-size: clamp(2.6rem, 12vw, 4.4rem);
+    font-weight: 640;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .menu__foot {
+    display: grid;
+    gap: 28px;
+    justify-items: start;
+  }
+
+  .menu__social {
+    display: flex;
+    gap: 14px;
+  }
+
+  .menu__social a {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--olive);
+    font-size: 1.7rem;
+  }
+
+  @media (max-width: 900px) {
+    .head {
+      justify-content: center;
+      height: 68px;
+    }
+
+    .head__nav,
+    .head__caja {
+      display: none;
+    }
+
+    .head__burger {
+      display: block;
+    }
+
+    .head[data-menu-open='true'] {
+      background: transparent;
+      color: var(--cream);
+    }
+
+    .aviso__ev,
+    .aviso i {
+      display: none;
+    }
+  }
+</style>

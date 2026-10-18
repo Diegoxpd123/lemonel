@@ -1,0 +1,209 @@
+:root {
+  --olive: #67744a;
+  --olive-deep: #4a5533;
+  --olive-night: #333b22;
+  --ink: #232a17;
+  --cream: #faf6ea;
+  --cream-2: #f2ebd5;
+  --sage: #bccb94;
+  --blush: #f4c9be;
+  --lilac: #d3bcf0;
+  --sand: #f1da94;
+  --deep: #4a5533;
+  --gold: #c9a24a;
+  --plum: #6a4c93;
+  --wine: #8f3e52;
+  --forest: #2f6a4a;
+  --amber: #8d6420;
+  --font-display: 'Fraunces Variable', 'Georgia', serif;
+  --font-text: 'DM Sans Variable', system-ui, sans-serif;
+  --gutter: clamp(12px, 1.8vw, 28px);
+  --section: clamp(44px, 5.5vw, 88px);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --vh: 1vh;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  font-weight: 420;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body.is-locked {
+  overflow: hidden;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 640;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--olive);
+  color: var(--cream);
+}
+
+:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 54px;
+  padding: 0 1.9em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--olive-deep);
+  color: var(--cream);
+  font-family: var(--font-text);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  transition: transform 0.35s var(--ease), background-color 0.25s ease;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  background: var(--olive-night);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn--cream {
+  background: var(--cream);
+  color: var(--olive-night);
+}
+
+.btn--cream:hover {
+  background: #fff9e8;
+}
+
+.btn--gold {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.btn--gold:hover {
+  background: #d7b25a;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: inherit;
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+
+.btn--ghost:hover {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.wrap {
+  padding-inline: var(--gutter);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+[data-reveal] {
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.js [data-hero-line] {
+  opacity: 0;
+}
+
+.js [data-hero-in],
+.js .hero__stage {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-hero-line] {
+    opacity: 1;
+  }
+
+  .js [data-hero-in],
+  .js .hero__stage {
+    opacity: 1;
+  }
+}
+
+.btn .icon {
+  font-size: 1.25em;
+}

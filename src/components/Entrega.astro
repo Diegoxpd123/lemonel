@@ -1,0 +1,197 @@
+---
+import Icon from './Icon.astro'
+
+const pasos = [
+  {
+    icono: 'diamond',
+    titulo: 'Eliges tus joyas',
+    texto: 'Toca «A la caja» en cada pieza y se acomoda dentro, lista para tu pedido.',
+    foto: '/fotos/collar-corazon-oro.webp',
+    alt: 'Collar con corazón dorado',
+  },
+  {
+    icono: 'pencil-simple',
+    titulo: 'Las ponemos en su tarjeta',
+    texto: 'Cada joya va montada en su tarjeta «Amor en cada detalle», lista para regalar.',
+    foto: '/fotos/evento-cajas.webp',
+    alt: 'Pulseras de perlas en sus cajitas',
+  },
+  {
+    icono: 'gift',
+    titulo: 'Cerramos con lazo crema',
+    texto: 'Cajita kraft, papel de seda y lazo. Para eventos, personalizamos con nombre o fecha.',
+    foto: '/fotos/set-perlas.webp',
+    alt: 'Colección de pulseras de perlas',
+  },
+  {
+    icono: 'truck',
+    titulo: 'Llega a todo el Perú',
+    texto: 'Coordinamos el envío contigo por WhatsApp y te avisamos cuando tu caja salga.',
+    foto: '/fotos/entrega-modelo.webp',
+    alt: 'Collares dorados en capas sobre una blusa blanca',
+  },
+]
+---
+
+<section class="ent" id="entrega" data-entrega>
+  <div class="ent__stage-wrap">
+    <div class="ent__stage" data-ent-stage>
+      <div class="ent__frame">
+        {
+          pasos.map((p, i) => (
+            <img class="ent__img" src={p.foto} alt={p.alt} width="900" height="1125" loading="lazy" decoding="async" data-ent-img={i} style={i === 0 ? undefined : 'opacity:0'} />
+          ))
+        }
+        <div class="ent__badge" data-ent-badge>
+          {pasos.map((p, i) => (
+            <span class="ent__ico" data-ent-ico={i} style={i === 0 ? undefined : 'opacity:0'}>
+              <Icon name={p.icono} weight="regular" />
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ent__steps">
+    <h2 class="ent__title wrap" data-reveal>Así llega tu regalo</h2>
+    <ol>
+      {pasos.map((p, i) => (
+        <li class="ent__step" data-ent-step={i}>
+          <div class="wrap">
+            <h3>{p.titulo}</h3>
+            <p>{p.texto}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .ent {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    background: var(--forest);
+    color: #fffdf5;
+  }
+
+  .ent__stage {
+    position: sticky;
+    top: 0;
+    display: grid;
+    place-items: center;
+    height: 100svh;
+    padding: 104px var(--gutter) 3vh;
+  }
+
+  .ent__frame {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 4 / 5;
+    max-width: 100%;
+    overflow: hidden;
+    background: var(--olive-deep);
+  }
+
+  .ent__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: transform, opacity;
+  }
+
+  .ent__badge {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--olive-deep);
+  }
+
+  .ent__ico {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 2.1rem;
+  }
+
+  .ent__steps {
+    padding-top: var(--section);
+  }
+
+  .ent__title {
+    font-size: clamp(2.6rem, 6vw, 6.4rem);
+    padding-bottom: 3vh;
+  }
+
+  .ent ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ent__step {
+    display: flex;
+    align-items: center;
+    min-height: 52svh;
+  }
+
+  .ent__step h3 {
+    font-size: clamp(2.2rem, 4.4vw, 4.4rem);
+  }
+
+  .ent__step p {
+    max-width: 27rem;
+    margin-top: 18px;
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 860px) {
+    .ent {
+      grid-template-columns: 1fr;
+    }
+
+    .ent__stage-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--forest);
+    }
+
+    .ent__stage {
+      position: static;
+      height: 52svh;
+      padding: 110px var(--gutter) 12px;
+    }
+
+    .ent__badge {
+      width: 56px;
+      height: 56px;
+    }
+
+    .ent__ico {
+      font-size: 1.6rem;
+    }
+
+    .ent__steps {
+      padding-top: 5vh;
+    }
+
+    .ent__title {
+      padding-bottom: 4vh;
+    }
+
+    .ent__step {
+      min-height: 40svh;
+    }
+  }
+</style>
