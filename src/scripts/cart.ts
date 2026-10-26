@@ -166,7 +166,16 @@ export const fechaLegible = (iso: string) => {
   return y && m && d ? `${d}/${m}/${y}` : iso
 }
 
-export const urlWhatsapp = (ls: LineaCalc[], opts: { evento?: Evento | null; nota?: string; pedido?: { codigo: string; url: string } | null } = {}) => {
+export interface DatosCliente {
+  nombre: string
+  whatsapp: string
+  ciudad: string
+}
+
+export const urlWhatsapp = (
+  ls: LineaCalc[],
+  opts: { evento?: Evento | null; nota?: string; pedido?: { codigo: string; url: string } | null; cliente?: DatosCliente | null } = {},
+) => {
   const total = redondear(ls.reduce((a, l) => a + l.total, 0))
   const filas = ls.map((l) => {
     const desc = l.descuento ? ` (${Math.round(l.descuento * 100)}% menos por cantidad)` : ''
@@ -175,6 +184,7 @@ export const urlWhatsapp = (ls: LineaCalc[], opts: { evento?: Evento | null; not
     return `• ${l.qty} × ${l.p.nombre}${cod} — ${dinero(l.total)}${desc}${det}`
   })
   const partes = ['Hola Lemonel, quiero hacer este pedido:', '', ...filas, '', `Total: ${dinero(total)}`]
+  if (opts.cliente) partes.push('', 'Mis datos:', `Nombre: ${opts.cliente.nombre}`, `WhatsApp: ${opts.cliente.whatsapp}`, `Ciudad: ${opts.cliente.ciudad}`)
   if (opts.evento) {
     partes.push('', `Es para un evento: ${opts.evento.tipo}${opts.evento.fecha ? `, el ${fechaLegible(opts.evento.fecha)}` : ''}`)
   }

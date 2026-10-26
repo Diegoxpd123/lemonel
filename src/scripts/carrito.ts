@@ -2,10 +2,11 @@ import gsap from 'gsap'
 import plus from '/node_modules/@phosphor-icons/core/assets/light/plus-light.svg?raw'
 import minus from '/node_modules/@phosphor-icons/core/assets/light/minus-light.svg?raw'
 import trash from '/node_modules/@phosphor-icons/core/assets/light/trash-light.svg?raw'
-import { dinero, onChange, remove, resumen, setQty, urlWhatsapp } from './cart'
+import { dinero, onChange, remove, resumen, setQty, urlWhatsapp, type DatosCliente } from './cart'
 import { $, $$, reduce, toast } from './util'
 
 const ULTIMO = 'lemonel-ultimo-pedido'
+const CLIENTE = 'lemonel-cliente'
 
 const icono = (svg: string) => svg.replace('<svg ', '<svg width="1em" height="1em" aria-hidden="true" ')
 
@@ -28,6 +29,10 @@ export function initCarrito() {
   const tipo = $('[data-evento-tipo]') as HTMLSelectElement
   const fecha = $('[data-evento-fecha]') as HTMLInputElement
   const nota = $('[data-cart-nota]') as HTMLTextAreaElement
+  const campoNombre = $('[data-cliente-nombre]') as HTMLInputElement
+  const campoWa = $('[data-cliente-wa]') as HTMLInputElement
+  const campoCiudad = $('[data-cliente-ciudad]') as HTMLInputElement
+  const errorDatos = $('[data-cart-err]')!
   const counts = $$('[data-count]')
   let abierto = false
   let lastFocus: HTMLElement | null = null
@@ -130,8 +135,59 @@ export function initCarrito() {
   })
   fecha.addEventListener('input', () => fecha.setCustomValidity(''))
 
-  const registrar = async (lineas: ReturnType<typeof resumen>['lineas'], evento: { tipo: string; fecha: string } | null, texto: string) => {
-    const huella = JSON.stringify([lineas.map((l) => [l.l.id, l.l.vi, l.l.op, l.l.dis, l.qty]), texto, evento])
+  try {
+    const guardado = JSON.parse(localStorage.getItem(CLIENTE) ?? 'null') as Partial<DatosCliente> | null
+    if (guardado) {
+      campoNombre.value = guardado.nombre ?? ''
+      campoWa.value = guardado.whatsapp ?? ''
+      campoCiudad.value = guardado.ciudad ?? ''
+    }
+  } catch {
+    localStorage.removeItem(CLIENTE)
+  }
+
+  const guardarCliente = () => {
+    try {
+      localStorage.setItem(CLIENTE, JSON.stringify({ nombre: campoNombre.value.trim(), whatsapp: campoWa.value.trim(), ciudad: campoCiudad.value.trim() }))
+    } catch {
+      return
+    }
+  }
+
+  ;[campoNombre, campoWa, campoCiudad].forEach((c) =>
+    c.addEventListener('input', () => {
+      c.removeAttribute('aria-invalid')
+      errorDatos.hidden = true
+      guardarCliente()
+    }),
+  )
+
+  const leerCliente = (): DatosCliente | null => {
+    const nombre = campoNombre.value.trim()
+    const whatsapp = campoWa.value.trim()
+    const digitos = whatsapp.replace(/\D/g, '')
+    const ciudad = campoCiudad.value.trim()
+    const fallas: [HTMLInputElement, string][] = []
+    if (nombre.length < 2) fallas.push([campoNombre, 'Escribe tu nombre y apellido'])
+    const valido = (digitos.length === 9 && digitos.startsWith('9')) || (digitos.length >= 10 && digitos.length <= 15)
+    if (!valido) fallas.push([campoWa, 'Escribe tu WhatsApp con 9 dígitos, por ejemplo 987 654 321'])
+    if (ciudad.length < 2) fallas.push([campoCiudad, 'Escribe tu ciudad o distrito'])
+    ;[campoNombre, campoWa, campoCiudad].forEach((c) => c.removeAttribute('aria-invalid'))
+    if (fallas.length) {
+      fallas.forEach(([c]) => c.setAttribute('aria-invalid', 'true'))
+      errorDatos.textContent = fallas[0]![1]
+      errorDatos.hidden = false
+      fallas[0]![0].focus()
+      fallas[0]![0].scrollIntoView({ block: 'center', behavior: reduce() ? 'auto' : 'smooth' })
+      return null
+    }
+    errorDatos.hidden = true
+    guardarCliente()
+    return { nombre, whatsapp, ciudad }
+  }
+
+  const registrar = async (lineas: ReturnType<typeof resumen>['lineas'], evento: { tipo: string; fecha: string } | null, texto: string, cliente: DatosCliente) => {
+    const huella = JSON.stringify([lineas.map((l) => [l.l.id, l.l.vi, l.l.op, l.l.dis, l.qty]), texto, evento, cliente])
     try {
       const previo = JSON.parse(localStorage.getItem(ULTIMO) ?? 'null') as { huella: string; codigo: string; url: string; hasta: number } | null
       if (previo && previo.huella === huella && previo.hasta > Date.now()) return { codigo: previo.codigo, url: previo.url }
@@ -141,7 +197,7 @@ export function initCarrito() {
     const res = await fetch('/api/pedido', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: lineas.map((l) => ({ id: l.l.id, vi: l.l.vi, op: l.l.op, dis: l.l.dis, qty: l.qty })), nota: texto, evento }),
+      body: JSON.stringify({ items: lineas.map((l) => ({ id: l.l.id, vi: l.l.vi, op: l.l.op, dis: l.l.dis, qty: l.qty })), nota: texto, evento, cliente }),
     })
     const datos = (await res.json().catch(() => ({}))) as { codigo?: string; ruta?: string; error?: string }
     if (res.status === 400) throw new Error(datos.error ?? 'Revisa tu pedido')
@@ -163,6 +219,8 @@ export function initCarrito() {
       fecha.reportValidity()
       return
     }
+    const cliente = leerCliente()
+    if (!cliente) return
     const evento = toggle.checked ? { tipo: tipo.value, fecha: fecha.value } : null
     const ventana = window.open('', '_blank')
     send.setAttribute('aria-busy', 'true')
@@ -172,7 +230,7 @@ export function initCarrito() {
     if (etiqueta) etiqueta.textContent = ' Preparando tu pedido…'
     let pedido: { codigo: string; url: string } | null = null
     try {
-      pedido = await registrar(r.lineas, evento, nota.value)
+      pedido = await registrar(r.lineas, evento, nota.value, cliente)
     } catch (e) {
       ventana?.close()
       toast((e as Error).message)
@@ -182,7 +240,7 @@ export function initCarrito() {
       send.disabled = resumen().piezas === 0
       if (etiqueta) etiqueta.textContent = textoOriginal
     }
-    const url = urlWhatsapp(r.lineas, { evento, nota: nota.value, pedido })
+    const url = urlWhatsapp(r.lineas, { evento, nota: nota.value, pedido, cliente })
     if (ventana) {
       ventana.opener = null
       ventana.location.href = url

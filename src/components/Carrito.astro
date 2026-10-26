@@ -26,6 +26,24 @@ import Icon from './Icon.astro'
     <ul class="cart__lines" data-cart-lines></ul>
 
     <div class="cart__extra" data-cart-extra hidden>
+      <fieldset class="cart__datos">
+        <legend>Tus datos</legend>
+        <p class="cart__datos-s">Así coordinamos tu pedido y tu envío. Si algo falla con WhatsApp, también podemos escribirte nosotros.</p>
+        <div class="field">
+          <label for="cart-nombre">Nombre y apellido</label>
+          <input id="cart-nombre" type="text" autocomplete="name" maxlength="120" required data-cliente-nombre />
+        </div>
+        <div class="field">
+          <label for="cart-wa">Tu WhatsApp</label>
+          <input id="cart-wa" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="987 654 321" required data-cliente-wa />
+        </div>
+        <div class="field">
+          <label for="cart-ciudad">Ciudad o distrito</label>
+          <input id="cart-ciudad" type="text" autocomplete="address-level2" maxlength="80" placeholder="Ej. Lima, Arequipa…" required data-cliente-ciudad />
+        </div>
+        <p class="cart__err" role="alert" data-cart-err hidden></p>
+      </fieldset>
+
       <div class="cart__gift">
         <Icon name="gift" weight="light" />
         <div>
@@ -421,6 +439,42 @@ import Icon from './Icon.astro'
   .cart__send[aria-busy='true'] {
     opacity: 0.75;
     cursor: progress;
+  }
+
+  .cart__datos {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+    margin: 0 0 20px;
+    padding: 0;
+    border: 0;
+  }
+
+  .cart__datos legend {
+    padding: 0;
+    margin-bottom: 4px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--ink);
+  }
+
+  .cart__datos-s {
+    margin: 0 0 2px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .cart__datos input[aria-invalid='true'] {
+    border-color: #a63d40;
+    background: #fbf1f0;
+  }
+
+  .cart__err {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #a63d40;
   }
 
   .cart__seguir {
