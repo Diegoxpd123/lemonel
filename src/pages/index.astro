@@ -2,34 +2,47 @@
 import Layout from '../layouts/Layout.astro'
 import Header from '../components/Header.astro'
 import Hero from '../components/Hero.astro'
-import Cinta from '../components/Cinta.astro'
-import Tira from '../components/Tira.astro'
-import Catalogo from '../components/Catalogo.astro'
+import Beneficios from '../components/Beneficios.astro'
+import Vendidos from '../components/Vendidos.astro'
+import Banner from '../components/Banner.astro'
+import Fila from '../components/Fila.astro'
 import Colecciones from '../components/Colecciones.astro'
-import Galeria from '../components/Galeria.astro'
-import Evento from '../components/Evento.astro'
-import Entrega from '../components/Entrega.astro'
+import Catalogo from '../components/Catalogo.astro'
+import Eventos from '../components/Eventos.astro'
 import Faq from '../components/Faq.astro'
 import Footer from '../components/Footer.astro'
-import Caja from '../components/Caja.astro'
+import Carrito from '../components/Carrito.astro'
+import Producto from '../components/Producto.astro'
+import { productos } from '../data/products'
+
+const nuevos = productos.filter((p) => p.nuevo).slice(0, 4)
+const collares = productos.filter((p) => p.categoria === 'collares' && !p.nuevo).slice(0, 4)
+const joyasMano = productos.filter((p) => (p.categoria === 'aretes' || p.categoria === 'anillos') && !p.nuevo)
+const muneca = productos.filter((p) => p.categoria === 'pulseras' || p.categoria === 'relojes').filter((p) => !p.nuevo).slice(0, 4)
 ---
 
-<Layout title="Lemonel · Joyas que llegan como un regalo" description="Collares, pulseras, aretes y relojes de Lemonel en su cajita con lazo. Arma tu caja y pide por WhatsApp. Pedidos para eventos, envíos a todo el Perú.">
+<Layout title="Lemonel · Más que joyas, historias tuyas" description="Collares, aretes, anillos, pulseras y relojes de Lemonel en acero inoxidable con baño de oro. Elige tus joyas, arma tu carrito y pide por WhatsApp. Pedidos para eventos y envíos a todo el Perú.">
   <Header />
   <main>
     <Hero />
-    <Cinta />
-    <Tira />
-    <Catalogo />
+    <Beneficios />
+    <Vendidos />
+    <Banner id="novedades" foto="/fotos/b-nuevo.webp" etiqueta="Nuevo · Colección 2026" titulo="Pequeños detalles, grandes historias." texto="Diseños que te acompañan siempre. Descubre lo último de Lemonel." boton="Ver novedades" href="#catalogo" posicion="50% 30%" />
+    <Fila productos={nuevos} verTodo={{ texto: 'Ver todas las joyas', filtro: 'todo' }} />
+    <Banner foto="/fotos/b-collares.webp" etiqueta="Colección" titulo="Collares" texto="Cadenas finas, corazones, cruces y medallones para cada momento." boton="Ver collares" filtro="collares" posicion="50% 38%" derecha />
+    <Fila productos={collares} fondo="var(--white)" />
+    <Banner foto="/fotos/b-aretes.webp" etiqueta="Colección" titulo="Aretes y anillos" texto="Argollas, flores y aros que se lucen solos o en pareja." boton="Ver aretes" filtro="aretes" posicion="50% 30%" />
+    <Fila productos={joyasMano} />
+    <Banner id="regalos" foto="/fotos/b-pulseras.webp" etiqueta="Regalos para momentos reales" titulo="Pulseras y relojes" texto="Perlas de río, cierres dorados y relojes atemporales, siempre en su cajita." boton="Ver pulseras" filtro="pulseras" posicion="50% 35%" derecha />
+    <Fila productos={muneca} fondo="var(--white)" verTodo={{ texto: 'Ver todas las joyas', filtro: 'todo' }} />
     <Colecciones />
-    <Galeria />
-    <Evento />
-    <Entrega />
-    <Tira desfase={9} fondo="var(--blush)" />
+    <Catalogo />
+    <Eventos />
     <Faq />
   </main>
   <Footer />
-  <Caja />
+  <Carrito />
+  <Producto />
   <script>
     import '../scripts/main.ts'
   </script>

@@ -1,121 +1,122 @@
 ---
 import Icon from './Icon.astro'
+import Tarjeta from './Tarjeta.astro'
 import { productos, categorias } from '../data/products'
-import { config } from '../data/config'
-
-const precio = (n: number) => `${config.moneda} ${n}`
 ---
 
 <section class="cat" id="catalogo" data-catalogo>
-  <div class="cat__head wrap">
-    <h2 data-reveal>Elige lo que vas a regalar</h2>
-    <p class="cat__sub" data-reveal>Toca «A la caja» en cada joya. Cuando termines, cerramos la tapa y tu pedido sale por WhatsApp.</p>
+  <div class="cat__head wrap" data-rv>
+    <div>
+      <p class="eyebrow">Todos los diseños</p>
+      <h2 class="titulo">Elige lo que vas a regalar</h2>
+    </div>
+    <p class="cat__sub">Agrega tus favoritas al carrito. Cuando termines, tu pedido sale directo a nuestro WhatsApp.</p>
   </div>
 
-  <div class="cat__bar wrap" data-reveal>
-    <div class="cat__filters" role="group" aria-label="Filtrar por categoría">
-      {categorias.map((c, i) => (
-        <button class="chip" type="button" data-filter={c.id} aria-pressed={i === 0 ? 'true' : 'false'}>{c.nombre}</button>
-      ))}
+  <div class="cat__bar wrap">
+    <div class="cat__chips" role="group" aria-label="Filtrar por categoría">
+      {categorias.map((c, i) => <button type="button" class="chip" data-chip={c.id} aria-pressed={i === 0 ? 'true' : 'false'}>{c.nombre}</button>)}
+      <button type="button" class="chip" data-chip="favoritos" aria-pressed="false">
+        <Icon name="heart" weight="light" />
+        Favoritos
+      </button>
     </div>
-    <button class="cat__clear" type="button" data-clear-col hidden>
-      <span data-col-name></span>
-      <span>Quitar filtro</span>
+    <button class="cat__clear" type="button" data-limpiar hidden>
+      <span data-limpiar-texto></span>
+      <Icon name="x" weight="light" />
     </button>
   </div>
 
   <div class="cat__grid wrap" data-grid>
-    {productos.map((p) => (
-      <article class={`tile tile--${p.tono}`} data-id={p.id} data-cat={p.categoria} data-col={(p.colecciones ?? []).join(' ')} data-tile>
-        <div class="tile__art" data-art>
-          <img src={p.foto} alt={p.alt} width="900" height="1125" loading="lazy" decoding="async" />
-        </div>
-        <div class="tile__info">
-          <h3>{p.nombre}</h3>
-          <p>{p.nota}</p>
-        </div>
-        <button class="tile__add" type="button" data-add={p.id}>
-          <span class="tile__lab"><Icon name="plus" weight="bold" />A la caja</span>
-          <strong>{precio(p.precio)}</strong>
-        </button>
-      </article>
-    ))}
+    {productos.map((p) => <Tarjeta p={p} />)}
   </div>
+  <p class="cat__vacio wrap" data-vacio hidden>Aún no tienes favoritos. Toca el corazón en las joyas que te gusten.</p>
 </section>
 
 <style>
   .cat {
-    padding-block: var(--section);
+    padding-block: var(--gap-section);
+    background: var(--ivory);
+    scroll-margin-top: 80px;
   }
 
   .cat__head {
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-    align-items: end;
-    gap: 32px 64px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px 48px;
+    flex-wrap: wrap;
+    margin-bottom: clamp(18px, 2vw, 28px);
   }
 
-  .cat__head h2 {
-    font-size: clamp(2.6rem, 7.4vw, 8rem);
+  .cat__head .eyebrow {
+    margin-bottom: 8px;
   }
 
   .cat__sub {
-    max-width: 26rem;
-    padding-bottom: 0.6em;
-    font-size: 1.15rem;
+    max-width: 24rem;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
   }
 
   .cat__bar {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    margin-top: clamp(18px, 2.4vw, 30px);
-    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: clamp(18px, 2vw, 26px);
   }
 
-  .cat__filters {
+  .cat__chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
   }
 
   .chip {
-    min-height: 48px;
-    padding: 0 1.4em;
-    border: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 20px;
+    border: 1px solid var(--line);
     border-radius: 999px;
-    background: var(--cream-2);
-    font-weight: 650;
-    transition: background-color 0.25s ease, color 0.25s ease, transform 0.35s var(--ease);
+    background: transparent;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+  }
+
+  .chip :global(.icon) {
+    font-size: 1.1rem;
   }
 
   .chip:hover {
-    transform: translateY(-2px);
+    border-color: var(--olive);
   }
 
   .chip[aria-pressed='true'] {
-    background: var(--olive-deep);
-    color: var(--cream);
+    background: var(--olive);
+    border-color: var(--olive);
+    color: var(--white);
   }
 
   .cat__clear {
     display: inline-flex;
-    gap: 14px;
     align-items: center;
-    min-height: 48px;
-    padding: 0 1.4em;
+    gap: 10px;
+    min-height: 42px;
+    padding: 0 18px;
     border: 0;
     border-radius: 999px;
-    background: var(--gold);
-    color: var(--ink);
-    font-weight: 700;
-  }
-
-  .cat__clear span:last-child {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    background: var(--rose);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
 
   .cat__clear[hidden] {
@@ -123,142 +124,48 @@ const precio = (n: number) => `${config.moneda} ${n}`
   }
 
   .cat__grid {
-    --gap: 10px;
     --cols: 4;
+    --gap: clamp(8px, 1vw, 14px);
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--gap);
+    row-gap: clamp(24px, 3vw, 40px);
   }
 
-  .tile {
+  .cat__grid :global(.card) {
     flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
-    position: relative;
-    display: grid;
-    grid-template-rows: auto auto auto;
-    gap: 14px;
-    padding: 0 0 clamp(14px, 1.6vw, 22px);
-    transition: opacity 0.4s ease;
   }
 
-  .tile[hidden] {
+  .cat__vacio {
+    padding-block: 32px;
+    text-align: center;
+    color: var(--ink-soft);
+  }
+
+  .cat__vacio[hidden] {
     display: none;
   }
 
-  .tile--sage {
-    background: var(--sage);
-  }
-
-  .tile--blush {
-    background: var(--blush);
-  }
-
-  .tile--lilac {
-    background: var(--lilac);
-  }
-
-  .tile--sand {
-    background: var(--sand);
-  }
-
-  .tile__art {
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
-    background: rgba(63, 42, 30, 0.08);
-  }
-
-  .tile__art img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.9s var(--ease);
-  }
-
-  .tile:hover .tile__art img {
-    transform: scale(1.06);
-  }
-
-  .tile__info,
-  .tile__add {
-    margin-inline: clamp(14px, 1.6vw, 22px);
-  }
-
-  .tile__info h3 {
-    font-size: clamp(1.4rem, 2vw, 1.9rem);
-    line-height: 1;
-    letter-spacing: -0.025em;
-  }
-
-  .tile__info p {
-    margin-top: 6px;
-    font-size: 0.98rem;
-    line-height: 1.35;
-  }
-
-  .tile__add {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    min-height: 52px;
-    padding: 0 1.3em;
-    border: 0;
-    border-radius: 999px;
-    background: var(--olive-deep);
-    color: var(--cream);
-    font-weight: 700;
-    transition: transform 0.35s var(--ease), background-color 0.25s ease;
-  }
-
-  .tile--deep .tile__add {
-    background: var(--cream);
-    color: var(--olive-night);
-  }
-
-  .tile__lab {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .tile__add:hover {
-    transform: translateY(-2px);
-    background: var(--olive-night);
-  }
-
-  .tile--deep .tile__add:hover {
-    background: #fff9e8;
-  }
-
-  .tile__add:active {
-    transform: scale(0.97);
-  }
-
-  @media (max-width: 1100px) {
-    .cat__grid {
-      --cols: 3;
-    }
-  }
-
-  @media (max-width: 760px) {
-    .cat__head {
-      grid-template-columns: 1fr;
-    }
-
+  @media (max-width: 960px) {
     .cat__grid {
       --cols: 2;
-      --gap: 8px;
     }
 
-    .tile__add {
-      padding-inline: 1em;
-      font-size: 0.95rem;
-      margin-inline: 10px;
+    .cat__chips {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-inline: calc(var(--pad) * -1);
+      padding-inline: var(--pad);
+      scrollbar-width: none;
     }
 
-    .tile__info {
-      margin-inline: 10px;
+    .cat__chips::-webkit-scrollbar {
+      display: none;
     }
 
+    .chip {
+      flex: none;
+    }
   }
 </style>

@@ -1,22 +1,61 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { $, $$, reduce } from './util'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const $ = <T extends Element>(s: string, root: ParentNode = document) => root.querySelector(s) as T | null
-const $$ = <T extends Element>(s: string, root: ParentNode = document) => Array.from(root.querySelectorAll(s)) as T[]
+export function initFaq() {
+  const items = $$('[data-item]')
+  const cerrar = (it: HTMLElement) => {
+    const q = $('[data-q]', it)!
+    const a = it.querySelector('.faq__a') as HTMLElement
+    q.setAttribute('aria-expanded', 'false')
+    if (reduce()) {
+      a.hidden = true
+      return
+    }
+    gsap.to(a, { height: 0, duration: 0.35, ease: 'power2.inOut', onComplete: () => { a.hidden = true; gsap.set(a, { clearProps: 'height' }) } })
+  }
+  const abrir = (it: HTMLElement) => {
+    const q = $('[data-q]', it)!
+    const a = it.querySelector('.faq__a') as HTMLElement
+    q.setAttribute('aria-expanded', 'true')
+    a.hidden = false
+    if (!reduce()) gsap.fromTo(a, { height: 0 }, { height: 'auto', duration: 0.4, ease: 'power2.out', onComplete: () => gsap.set(a, { clearProps: 'height' }) })
+  }
+  items.forEach((it) => {
+    $('[data-q]', it)!.addEventListener('click', () => {
+      const abierto = $('[data-q]', it)!.getAttribute('aria-expanded') === 'true'
+      items.forEach((o) => {
+        if (o !== it && $('[data-q]', o)!.getAttribute('aria-expanded') === 'true') cerrar(o)
+      })
+      if (abierto) cerrar(it)
+      else abrir(it)
+    })
+  })
+}
 
-const marquesina = (track: Element | null, duracion: number, derecha = false) => {
-  if (!track) return
-  const tween = derecha
-    ? gsap.fromTo(track, { xPercent: -50 }, { xPercent: 0, duration: duracion, ease: 'none', repeat: -1 })
-    : gsap.to(track, { xPercent: -50, duration: duracion, ease: 'none', repeat: -1 })
-  ScrollTrigger.create({
-    onUpdate: (self) => {
-      const v = Math.min(Math.abs(self.getVelocity()) / 260, 7)
-      gsap.to(tween, { timeScale: 1 + v, duration: 0.25, overwrite: true })
-      gsap.to(tween, { timeScale: 1, duration: 1.4, delay: 0.25 })
-    },
+export function initNews() {
+  const form = $('[data-news]') as HTMLFormElement | null
+  if (!form) return
+  const email = $('[data-news-email]', form) as HTMLInputElement
+  const ok = $('[data-news-ok]', form) as HTMLInputElement
+  const msg = $('[data-news-msg]', form)!
+  form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const valido = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())
+    msg.hidden = false
+    if (!valido) {
+      msg.textContent = 'Escribe un correo válido para suscribirte.'
+      email.focus()
+      return
+    }
+    if (!ok.checked) {
+      msg.textContent = 'Acepta la política de privacidad para continuar.'
+      return
+    }
+    msg.textContent = '¡Gracias por unirte al círculo Lemonel! Pronto te escribiremos.'
+    form.reset()
   })
 }
 
@@ -24,11 +63,8 @@ export function initMotion() {
   const mm = gsap.matchMedia()
 
   mm.add('(prefers-reduced-motion: no-preference)', () => {
-    marquesina($('[data-cinta-track]'), 38)
-    $$('[data-tira-track]').forEach((t, i) => marquesina(t, 70 + i * 6, t.getAttribute('data-tira-track') === 'der'))
-
-    $$('[data-reveal]').forEach((el) => {
-      gsap.set(el, { autoAlpha: 0, y: 36 })
+    $$('[data-rv]').forEach((el) => {
+      gsap.set(el, { autoAlpha: 0, y: 26 })
       ScrollTrigger.create({
         trigger: el,
         start: 'top 90%',
@@ -37,67 +73,32 @@ export function initMotion() {
       })
     })
 
-    const lote = (sel: string, desde = 40) => {
-      const els = $$(sel)
-      gsap.set(els, { autoAlpha: 0, y: desde })
-      ScrollTrigger.batch(els, {
-        start: 'top 94%',
-        once: true,
-        onEnter: (b) => gsap.to(b, { autoAlpha: 1, y: 0, duration: 0.85, stagger: 0.08, ease: 'power3.out', overwrite: 'auto' }),
-      })
-    }
-    lote('[data-tile]')
-    lote('[data-gal]', 56)
-    lote('.tier', 30)
-
-    $$('[data-col-panel]').forEach((panel) => {
-      const title = $('[data-col-title]', panel)!
-      const big = $('[data-col-piece]', panel)!
-      const small = $('[data-col-small]', panel)!
-      const flip = panel.classList.contains('col--flip')
-      const st = { trigger: panel, start: 'top bottom', end: 'bottom top', scrub: 0.6 }
-      gsap.fromTo(title, { xPercent: flip ? 5 : -5 }, { xPercent: flip ? -3 : 3, ease: 'none', scrollTrigger: st })
-      gsap.fromTo(big, { y: 70, rotation: flip ? 2 : -2 }, { y: -70, rotation: flip ? -1.5 : 1.5, ease: 'none', scrollTrigger: st })
-      gsap.fromTo(small, { y: -50 }, { y: 70, ease: 'none', scrollTrigger: st })
-    })
-
-    const imgs = $$('[data-ent-img]')
-    const icos = $$('[data-ent-ico]')
-    if (imgs.length) {
-      let activo = 0
-      const ir = (i: number) => {
-        if (i === activo) return
-        const out = imgs[activo]
-        const inn = imgs[i]
-        gsap.to(out, { autoAlpha: 0, scale: 1.06, duration: 0.7, ease: 'power2.inOut', overwrite: 'auto' })
-        gsap.fromTo(inn, { autoAlpha: 0, scale: 1.1 }, { autoAlpha: 1, scale: 1, duration: 1, ease: 'power3.out', overwrite: 'auto' })
-        gsap.to(icos[activo], { autoAlpha: 0, scale: 0.5, rotation: -40, duration: 0.3, overwrite: 'auto' })
-        gsap.fromTo(icos[i], { autoAlpha: 0, scale: 0.4, rotation: 40 }, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.6, delay: 0.15, ease: 'back.out(2.4)', overwrite: 'auto' })
-        activo = i
-      }
-      $$('[data-ent-step]').forEach((step, i) => {
-        ScrollTrigger.create({
-          trigger: step,
-          start: 'top 58%',
-          end: 'bottom 58%',
-          onEnter: () => ir(i),
-          onEnterBack: () => ir(i),
+    const grupos = ['.fila__grid', '.cat__grid', '.cols__grid', '.vend__row']
+    grupos.forEach((g) => {
+      $$(g).forEach((grid) => {
+        const hijos = $$('.card:not([hidden]), .tile', grid)
+        gsap.set(hijos, { autoAlpha: 0, y: 30 })
+        ScrollTrigger.batch(hijos, {
+          start: 'top 94%',
+          once: true,
+          onEnter: (b) => gsap.to(b, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.07, ease: 'power3.out', overwrite: 'auto' }),
         })
       })
-    }
+    })
+
+    $$('[data-parallax]').forEach((img) => {
+      const sec = img.closest('[data-banner]') as HTMLElement
+      gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: 'none', scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: true } })
+    })
 
     const nombre = $('[data-foot-name] span')
     if (nombre) {
-      gsap.fromTo(
-        nombre,
-        { yPercent: 38 },
-        { yPercent: 0, ease: 'none', scrollTrigger: { trigger: '[data-foot-name]', start: 'top bottom', end: 'bottom bottom', scrub: 0.5 } },
-      )
+      gsap.fromTo(nombre, { yPercent: 30 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: '[data-foot-name]', start: 'top bottom', end: 'bottom bottom', scrub: 0.5 } })
     }
 
-    $$('.btn, .chip, .tile__add, .dot').forEach((b) => {
-      b.addEventListener('pointerdown', () => gsap.to(b, { scale: 0.96, duration: 0.12, overwrite: 'auto' }))
-      const up = () => gsap.to(b, { scale: 1, duration: 0.45, ease: 'back.out(3)', overwrite: 'auto' })
+    $$('.btn, .chip, .preset').forEach((b) => {
+      b.addEventListener('pointerdown', () => gsap.to(b, { scale: 0.97, duration: 0.12, overwrite: 'auto' }))
+      const up = () => gsap.to(b, { scale: 1, duration: 0.4, ease: 'back.out(3)', overwrite: 'auto' })
       b.addEventListener('pointerup', up)
       b.addEventListener('pointerleave', up)
     })

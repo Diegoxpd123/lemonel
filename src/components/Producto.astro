@@ -1,0 +1,268 @@
+---
+import Icon from './Icon.astro'
+---
+
+<div class="pveil" data-pveil hidden></div>
+
+<div class="prod" data-prod role="dialog" aria-modal="true" aria-labelledby="prod-t" hidden>
+  <button class="prod__close" type="button" aria-label="Cerrar" data-cerrar-producto>
+    <Icon name="x" weight="light" />
+  </button>
+  <div class="prod__gal">
+    <img data-prod-img-a src="" alt="" width="900" height="1125" />
+    <img data-prod-img-b src="" alt="" width="900" height="1125" />
+  </div>
+  <div class="prod__info">
+    <p class="eyebrow" data-prod-cat></p>
+    <h2 id="prod-t" data-prod-name></h2>
+    <p class="prod__price" data-prod-price></p>
+    <p class="prod__txt" data-prod-det></p>
+    <p class="prod__nota" data-prod-nota></p>
+
+    <div class="prod__qty">
+      <span>Cantidad</span>
+      <div class="prod__step">
+        <button type="button" aria-label="Una menos" data-prod-menos><Icon name="minus" weight="light" /></button>
+        <input type="number" inputmode="numeric" min="1" value="1" aria-label="Cantidad" data-prod-cant />
+        <button type="button" aria-label="Una más" data-prod-mas><Icon name="plus" weight="light" /></button>
+      </div>
+    </div>
+
+    <button class="btn prod__add" type="button" data-prod-add>
+      <span>Agregar al carrito</span>
+      <Icon name="arrow-right" weight="light" />
+    </button>
+    <button class="prod__fav" type="button" data-prod-fav>
+      <Icon name="heart" weight="light" />
+      <span data-prod-fav-t>Agregar a favoritos</span>
+    </button>
+
+    <ul class="prod__ben">
+      <li><Icon name="truck" weight="light" /> Envíos a todo el Perú</li>
+      <li><Icon name="credit-card" weight="light" /> Pagos seguros</li>
+      <li><Icon name="gift" weight="light" /> Empaque especial</li>
+    </ul>
+  </div>
+</div>
+
+<style is:global>
+  .pveil {
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    background: rgba(40, 42, 30, 0.5);
+  }
+
+  .pveil[hidden],
+  .prod[hidden] {
+    display: none;
+  }
+
+  .prod {
+    position: fixed;
+    z-index: 120;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    width: min(1040px, calc(100% - 32px));
+    max-height: calc(100svh - 32px);
+    transform: translate(-50%, -50%);
+    border-radius: 24px;
+    background: var(--ivory);
+    overflow: hidden;
+  }
+
+  .prod__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(254, 252, 248, 0.92);
+    font-size: 1.5rem;
+    transition: background-color 0.25s var(--ease);
+  }
+
+  .prod__close:hover {
+    background: var(--white);
+  }
+
+  .prod__gal {
+    position: relative;
+    min-height: 420px;
+    background: var(--card);
+  }
+
+  .prod__gal img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s var(--ease);
+  }
+
+  .prod__gal img + img {
+    opacity: 0;
+  }
+
+  @media (hover: hover) {
+    .prod__gal:hover img + img {
+      opacity: 1;
+    }
+  }
+
+  .prod__info {
+    display: grid;
+    gap: 14px;
+    align-content: center;
+    padding: clamp(24px, 4vw, 52px);
+    overflow-y: auto;
+  }
+
+  .prod__info h2 {
+    font-size: clamp(1.9rem, 3vw, 2.6rem);
+  }
+
+  .prod__price {
+    font-size: 1.15rem;
+  }
+
+  .prod__txt {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+
+  .prod__nota {
+    font-family: var(--font-script);
+    font-size: 1.7rem;
+    line-height: 1;
+    color: var(--olive);
+  }
+
+  .prod__qty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 4px;
+  }
+
+  .prod__qty > span {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .prod__step {
+    display: inline-grid;
+    grid-template-columns: 42px 50px 42px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .prod__step button {
+    display: grid;
+    place-items: center;
+    min-height: 46px;
+    border: 0;
+    background: transparent;
+    font-size: 1.05rem;
+  }
+
+  .prod__step button:hover {
+    background: var(--cloud);
+  }
+
+  .prod__step input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    text-align: center;
+    font-weight: 500;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .prod__step input::-webkit-outer-spin-button,
+  .prod__step input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .prod__add {
+    width: 100%;
+  }
+
+  .prod__fav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 44px;
+    border: 0;
+    background: transparent;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .prod__fav .icon {
+    font-size: 1.3rem;
+  }
+
+  .prod__ben {
+    display: grid;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  .prod__ben li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .prod__ben .icon {
+    font-size: 1.4rem;
+    color: var(--olive);
+  }
+
+  @media (max-width: 760px) {
+    .prod {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      max-height: 94svh;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      transform: none;
+      border-radius: 24px 24px 0 0;
+      overflow-y: auto;
+    }
+
+    .prod__gal {
+      min-height: 0;
+      aspect-ratio: 1;
+    }
+
+    .prod__info {
+      overflow: visible;
+    }
+  }
+</style>

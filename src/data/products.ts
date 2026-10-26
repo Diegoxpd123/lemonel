@@ -1,93 +1,261 @@
-export type Kind =
-  | 'corazon'
-  | 'cruz'
-  | 'trebol'
-  | 'sol'
-  | 'rosa'
-  | 'perlas'
-  | 'argollas'
-  | 'flor'
-  | 'anillos'
-  | 'reloj'
-  | 'oval'
-
-export type Categoria = 'collares' | 'pulseras' | 'aretes' | 'anillos' | 'relojes'
-export type Tono = 'sage' | 'blush' | 'lilac' | 'sand' | 'deep'
+export type Categoria = 'collares' | 'aretes' | 'anillos' | 'pulseras' | 'relojes'
+export type Etiqueta = 'nuevo' | 'vendido' | 'limitado'
 
 export interface Producto {
   id: string
   nombre: string
   categoria: Categoria
-  kind: Kind
   precio: number
-  tono: Tono
-  colecciones?: string[]
-  evento?: boolean
+  antes?: number
+  etiqueta?: Etiqueta
+  colecciones: string[]
   nota: string
+  detalle: string
   foto: string
+  foto2: string
   alt: string
-  hero?: string
+  vendido?: boolean
+  nuevo?: boolean
+  evento?: boolean
 }
 
 export const categorias: { id: 'todo' | Categoria; nombre: string }[] = [
   { id: 'todo', nombre: 'Todo' },
   { id: 'collares', nombre: 'Collares' },
-  { id: 'pulseras', nombre: 'Pulseras' },
   { id: 'aretes', nombre: 'Aretes' },
   { id: 'anillos', nombre: 'Anillos' },
+  { id: 'pulseras', nombre: 'Pulseras' },
   { id: 'relojes', nombre: 'Relojes' },
 ]
 
+export const etiquetas: Record<Etiqueta, string> = {
+  nuevo: 'Nuevo',
+  vendido: 'Más vendido',
+  limitado: 'Edición limitada',
+}
+
 export const productos: Producto[] = [
-  { id: 'collar-corazon', nombre: 'Collar Corazón', categoria: 'collares', kind: 'corazon', precio: 49, tono: 'blush', colecciones: ['corazon'], nota: 'Dije de nácar y cadena fina', foto: '/fotos/collar-corazon.webp', alt: 'Collar con dije de corazón de nácar sobre tela blanca' },
-  { id: 'collar-corazon-oro', nombre: 'Corazón Dorado', categoria: 'collares', kind: 'corazon', precio: 58, tono: 'sand', colecciones: ['corazon'], nota: 'Corazón abombado, baño de oro', foto: '/fotos/collar-corazon-oro.webp', alt: 'Collar con corazón dorado abombado', hero: '/hero/corazon-oro.webp' },
-  { id: 'collar-cruz', nombre: 'Collar Cruz', categoria: 'collares', kind: 'cruz', precio: 38, tono: 'sand', evento: true, nota: 'Ideal para misas y bautizos', foto: '/fotos/collar-cruz.webp', alt: 'Collar dorado con cruz larga sobre fondo durazno' },
-  { id: 'collar-trebol', nombre: 'Collar Trébol', categoria: 'collares', kind: 'trebol', precio: 59, tono: 'sage', colecciones: ['trebol'], nota: 'Trébol de cuatro hojas', foto: '/fotos/collar-trebol.webp', alt: 'Dije de trébol negro con borde dorado' },
-  { id: 'collar-sol', nombre: 'Collar Sol', categoria: 'collares', kind: 'sol', precio: 55, tono: 'lilac', colecciones: ['sol'], nota: 'Inspirado en tu película favorita', foto: '/fotos/collar-sol.webp', alt: 'Collar con dije de sol sobre tela blanca', hero: '/hero/sol.webp' },
-  { id: 'collar-medallon', nombre: 'Collar Medallón', categoria: 'collares', kind: 'rosa', precio: 62, tono: 'sage', colecciones: ['flor'], nota: 'Nácar, cruces y medallones', foto: '/fotos/collar-medallon.webp', alt: 'Collares dorados con cruces y medallones de nácar', hero: '/hero/medallon.webp' },
-  { id: 'pulsera-perlas', nombre: 'Pulsera Perlas', categoria: 'pulseras', kind: 'perlas', precio: 45, tono: 'sand', evento: true, colecciones: ['flor', 'corazon'], nota: 'Perlas de río y cierre dorado', foto: '/fotos/pulsera-perlas.webp', alt: 'Pulsera de perlas sobre un plato blanco' },
-  { id: 'set-perlas', nombre: 'Set de Perlas', categoria: 'pulseras', kind: 'perlas', precio: 78, tono: 'blush', evento: true, colecciones: ['flor'], nota: 'Tres pulseras de perlas', foto: '/fotos/set-perlas.webp', alt: 'Colección de pulseras de perlas de río' },
-  { id: 'pulsera-dorada', nombre: 'Pulsera Ajustable', categoria: 'pulseras', kind: 'perlas', precio: 39, tono: 'sage', nota: 'Dorada, con perlas y cierre ajustable', foto: '/fotos/pulsera-dorada.webp', alt: 'Pulsera dorada ajustable con perlas' },
-  { id: 'aretes-argolla', nombre: 'Aretes Argolla', categoria: 'aretes', kind: 'argollas', precio: 35, tono: 'lilac', colecciones: ['trebol'], nota: 'Argolla trenzada, uso diario', foto: '/fotos/aretes-argolla.webp', alt: 'Aretes de argolla dorada trenzada', hero: '/hero/argollas.webp' },
-  { id: 'aretes-gruesos', nombre: 'Argollas Gruesas', categoria: 'aretes', kind: 'argollas', precio: 42, tono: 'blush', nota: 'Dobles, con baño de oro', foto: '/fotos/aretes-gruesos.webp', alt: 'Aretes de argolla gruesa dorada', hero: '/hero/argollas-2.webp' },
-  { id: 'aretes-flor', nombre: 'Aretes Flor', categoria: 'aretes', kind: 'flor', precio: 32, tono: 'lilac', colecciones: ['flor', 'sol'], nota: 'Flor lila, uso diario', foto: '/fotos/aretes-flor.webp', alt: 'Aretes de flor lila en la oreja' },
-  { id: 'anillos-pareja', nombre: 'Anillos de Pareja', categoria: 'anillos', kind: 'anillos', precio: 69, tono: 'blush', colecciones: ['corazon'], nota: 'Dos anillos, un solo regalo', foto: '/fotos/anillos-pareja.webp', alt: 'Dos anillos dorados sobre fondo claro', hero: '/hero/anillos.webp' },
-  { id: 'anillos-dorados', nombre: 'Anillos Dorados', categoria: 'anillos', kind: 'anillos', precio: 55, tono: 'sage', colecciones: ['corazon'], nota: 'Dos aros finos para combinar', foto: '/fotos/anillos-dorados.webp', alt: 'Dos anillos dorados en una cajita rosada' },
-  { id: 'reloj-cuadrado', nombre: 'Reloj Cuadrado', categoria: 'relojes', kind: 'reloj', precio: 119, tono: 'sage', colecciones: ['trebol'], nota: 'Caja cuadrada, pulsera dorada', foto: '/fotos/reloj-cuadrado.webp', alt: 'Reloj dorado cuadrado sobre un tejido', hero: '/hero/reloj-cuadrado.webp' },
-  { id: 'reloj-malla', nombre: 'Reloj Malla', categoria: 'relojes', kind: 'oval', precio: 129, tono: 'sand', colecciones: ['sol'], nota: 'Pulsera de malla, esfera rosada', foto: '/fotos/reloj-malla.webp', alt: 'Reloj con pulsera de malla rosada' },
+  {
+    id: 'collar-corazon',
+    nombre: 'Collar Corazón',
+    categoria: 'collares',
+    precio: 49,
+    etiqueta: 'vendido',
+    vendido: true,
+    colecciones: ['corazon'],
+    nota: 'Dije de nácar y cadena fina',
+    detalle: 'Un corazón de nácar sobre cadena dorada. Delicado, ligero y pensado para llevar todos los días.',
+    foto: '/fotos/collar-corazon.webp',
+    foto2: '/fotos/g-04.webp',
+    alt: 'Collar con dije de corazón de nácar sobre tela blanca',
+  },
+  {
+    id: 'collar-corazon-oro',
+    nombre: 'Corazón Dorado',
+    categoria: 'collares',
+    precio: 58,
+    etiqueta: 'nuevo',
+    nuevo: true,
+    colecciones: ['corazon'],
+    nota: 'Corazón abombado, baño de oro',
+    detalle: 'Corazón abombado con baño de oro y cadena fina. Una pieza de regalo que se luce sola.',
+    foto: '/fotos/collar-corazon-oro.webp',
+    foto2: '/fotos/g-16.webp',
+    alt: 'Collar con corazón dorado abombado',
+  },
+  {
+    id: 'collar-cruz',
+    nombre: 'Collar Cruz',
+    categoria: 'collares',
+    precio: 38,
+    etiqueta: 'vendido',
+    vendido: true,
+    evento: true,
+    colecciones: [],
+    nota: 'Ideal para misas y bautizos',
+    detalle: 'Cruz larga dorada con brillos. La favorita para misas, bautizos y primeras comuniones.',
+    foto: '/fotos/collar-cruz.webp',
+    foto2: '/fotos/g-05.webp',
+    alt: 'Collar dorado con cruz larga sobre fondo durazno',
+  },
+  {
+    id: 'collar-trebol',
+    nombre: 'Collar Trébol',
+    categoria: 'collares',
+    precio: 59,
+    etiqueta: 'limitado',
+    colecciones: ['trebol'],
+    nota: 'Trébol de cuatro hojas',
+    detalle: 'Trébol de cuatro hojas con borde dorado. La suerte también se regala.',
+    foto: '/fotos/collar-trebol.webp',
+    foto2: '/fotos/g-10.webp',
+    alt: 'Dije de trébol negro con borde dorado',
+  },
+  {
+    id: 'collar-sol',
+    nombre: 'Collar Sol',
+    categoria: 'collares',
+    precio: 55,
+    nuevo: true,
+    etiqueta: 'nuevo',
+    colecciones: ['sol'],
+    nota: 'Inspirado en tu película favorita',
+    detalle: 'Dije de sol con circonias sobre cadena fina. Un destello de luz para cada día.',
+    foto: '/fotos/collar-sol.webp',
+    foto2: '/fotos/g-12.webp',
+    alt: 'Collar con dije de sol sobre tela blanca',
+  },
+  {
+    id: 'collar-medallon',
+    nombre: 'Collar Medallón',
+    categoria: 'collares',
+    precio: 62,
+    vendido: true,
+    colecciones: ['flor'],
+    nota: 'Nácar, cruces y medallones',
+    detalle: 'Medallones de nácar y cruces sobre cadenas doradas para combinar en capas.',
+    foto: '/fotos/collar-medallon.webp',
+    foto2: '/fotos/g-01.webp',
+    alt: 'Collares dorados con cruces y medallones de nácar',
+  },
+  {
+    id: 'aretes-argolla',
+    nombre: 'Aretes Argolla',
+    categoria: 'aretes',
+    precio: 35,
+    vendido: true,
+    etiqueta: 'vendido',
+    colecciones: ['trebol'],
+    nota: 'Argolla trenzada, uso diario',
+    detalle: 'Argollas trenzadas con baño de oro. Ligeras y fáciles de combinar.',
+    foto: '/fotos/aretes-argolla.webp',
+    foto2: '/fotos/g-03.webp',
+    alt: 'Aretes de argolla dorada trenzada',
+  },
+  {
+    id: 'aretes-gruesos',
+    nombre: 'Argollas Gruesas',
+    categoria: 'aretes',
+    precio: 42,
+    nuevo: true,
+    etiqueta: 'nuevo',
+    colecciones: [],
+    nota: 'Dobles, con baño de oro',
+    detalle: 'Argollas dobles con baño de oro. Presencia y brillo sin pesar.',
+    foto: '/fotos/aretes-gruesos.webp',
+    foto2: '/fotos/g-07.webp',
+    alt: 'Aretes de argolla gruesa dorada',
+  },
+  {
+    id: 'aretes-flor',
+    nombre: 'Aretes Flor',
+    categoria: 'aretes',
+    precio: 32,
+    colecciones: ['flor', 'sol'],
+    nota: 'Flor lila, uso diario',
+    detalle: 'Flores de resina lila con montura dorada. Un toque de color para todos los días.',
+    foto: '/fotos/aretes-flor.webp',
+    foto2: '/fotos/g-11.webp',
+    alt: 'Aretes de flor lila en la oreja',
+  },
+  {
+    id: 'anillos-pareja',
+    nombre: 'Anillos de Pareja',
+    categoria: 'anillos',
+    precio: 69,
+    vendido: true,
+    colecciones: ['corazon'],
+    nota: 'Dos anillos, un solo regalo',
+    detalle: 'Dos anillos dorados para regalar en pareja. Vienen juntos en su cajita.',
+    foto: '/fotos/anillos-pareja.webp',
+    foto2: '/fotos/g-15.webp',
+    alt: 'Dos anillos dorados sobre fondo claro',
+  },
+  {
+    id: 'anillos-dorados',
+    nombre: 'Anillos Dorados',
+    categoria: 'anillos',
+    precio: 55,
+    nuevo: true,
+    etiqueta: 'nuevo',
+    colecciones: ['corazon'],
+    nota: 'Dos aros finos para combinar',
+    detalle: 'Dos aros finos dorados para apilar o llevar solos, en su cajita rosada.',
+    foto: '/fotos/anillos-dorados.webp',
+    foto2: '/fotos/g-17.webp',
+    alt: 'Dos anillos dorados en una cajita rosada',
+  },
+  {
+    id: 'pulsera-perlas',
+    nombre: 'Pulsera Perlas',
+    categoria: 'pulseras',
+    precio: 45,
+    vendido: true,
+    evento: true,
+    colecciones: ['flor', 'corazon'],
+    nota: 'Perlas de río y cierre dorado',
+    detalle: 'Perlas de río con cierre dorado. Un clásico para regalar y para eventos.',
+    foto: '/fotos/pulsera-perlas.webp',
+    foto2: '/fotos/g-02.webp',
+    alt: 'Pulsera de perlas sobre un plato blanco',
+  },
+  {
+    id: 'set-perlas',
+    nombre: 'Set de Perlas',
+    categoria: 'pulseras',
+    precio: 78,
+    evento: true,
+    etiqueta: 'limitado',
+    colecciones: ['flor'],
+    nota: 'Tres pulseras de perlas',
+    detalle: 'Tres pulseras de perlas de río para combinar o repartir como regalo.',
+    foto: '/fotos/set-perlas.webp',
+    foto2: '/fotos/g-06.webp',
+    alt: 'Colección de pulseras de perlas de río',
+  },
+  {
+    id: 'pulsera-dorada',
+    nombre: 'Pulsera Ajustable',
+    categoria: 'pulseras',
+    precio: 39,
+    colecciones: [],
+    nota: 'Dorada, con perlas y cierre ajustable',
+    detalle: 'Pulsera dorada con perlas y cierre ajustable que se adapta a cualquier muñeca.',
+    foto: '/fotos/pulsera-dorada.webp',
+    foto2: '/fotos/g-14.webp',
+    alt: 'Pulsera dorada ajustable con perlas',
+  },
+  {
+    id: 'reloj-cuadrado',
+    nombre: 'Reloj Cuadrado',
+    categoria: 'relojes',
+    precio: 119,
+    nuevo: true,
+    etiqueta: 'nuevo',
+    colecciones: ['trebol'],
+    nota: 'Caja cuadrada, pulsera dorada',
+    detalle: 'Caja cuadrada con pulsera dorada. Elegante y discreto para llevar todo el día.',
+    foto: '/fotos/reloj-cuadrado.webp',
+    foto2: '/fotos/g-09.webp',
+    alt: 'Reloj dorado cuadrado sobre un tejido',
+  },
+  {
+    id: 'reloj-malla',
+    nombre: 'Reloj Malla',
+    categoria: 'relojes',
+    precio: 129,
+    colecciones: ['sol'],
+    nota: 'Pulsera de malla, esfera rosada',
+    detalle: 'Pulsera de malla dorada con esfera rosada. Suave, moderno y atemporal.',
+    foto: '/fotos/reloj-malla.webp',
+    foto2: '/fotos/g-17.webp',
+    alt: 'Reloj con pulsera de malla rosada',
+  },
 ]
 
 export const colecciones = [
-  {
-    id: 'sol',
-    nombre: 'El sol',
-    frase: 'El set que parece sacado de tu película favorita.',
-    tono: 'lilac' as Tono,
-    foto: '/fotos/col-sol.webp',
-    foto2: '/fotos/g-18.webp',
-  },
-  {
-    id: 'trebol',
-    nombre: 'El trébol',
-    frase: 'La suerte también se regala. Mejor si es dorada.',
-    tono: 'sage' as Tono,
-    foto: '/fotos/col-trebol.webp',
-    foto2: '/fotos/collar-trebol.webp',
-  },
-  {
-    id: 'flor',
-    nombre: 'La flor',
-    frase: 'Detalles que no se marchitan, para decir lo que a veces no se dice.',
-    tono: 'blush' as Tono,
-    foto: '/fotos/col-rosa.webp',
-    foto2: '/fotos/aretes-flor.webp',
-  },
-  {
-    id: 'corazon',
-    nombre: 'El corazón',
-    frase: 'El regalo que toda amiga merece.',
-    tono: 'sand' as Tono,
-    foto: '/fotos/col-corazon.webp',
-    foto2: '/fotos/collar-corazon.webp',
-  },
+  { id: 'sol', nombre: 'El sol', foto: '/fotos/col-sol.webp' },
+  { id: 'trebol', nombre: 'El trébol', foto: '/fotos/col-trebol.webp' },
+  { id: 'flor', nombre: 'La flor', foto: '/fotos/col-rosa.webp' },
+  { id: 'corazon', nombre: 'El corazón', foto: '/fotos/col-corazon.webp' },
 ]

@@ -6,23 +6,70 @@ const wa = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent('Hola Lem
 ---
 
 <footer class="foot">
-  <div class="foot__cta wrap">
-    <p class="foot__lead" data-reveal>¿Lista para armar tu caja?</p>
-    <div class="foot__actions" data-reveal>
-      <a class="btn btn--cream" href="#catalogo">Ver catálogo<Icon name="arrow-right" weight="bold" /></a>
-      <a class="btn btn--ghost" href={wa} target="_blank" rel="noopener"><Icon name="whatsapp-logo" weight="regular" />Escríbenos por WhatsApp</a>
+  <section class="news wrap" aria-labelledby="news-t">
+    <div class="news__copy" data-rv>
+      <p class="eyebrow">Únete al círculo Lemonel</p>
+      <h2 class="titulo" id="news-t">Más que joyas, <span class="script">historias tuyas.</span></h2>
+      <p>Suscríbete y recibe 10% de descuento en tu primer pedido, además de novedades y regalos para momentos reales.</p>
+    </div>
+    <form class="news__form" data-news novalidate>
+      <div class="news__row">
+        <input type="email" placeholder="Tu correo" aria-label="Tu correo" autocomplete="email" data-news-email />
+        <button class="btn" type="submit">Suscribirme</button>
+      </div>
+      <label class="check">
+        <input type="checkbox" data-news-ok />
+        <span>Acepto recibir contenido de Lemonel por correo electrónico y la política de privacidad.</span>
+      </label>
+      <p class="news__msg" data-news-msg role="status" hidden></p>
+    </form>
+  </section>
+
+  <div class="foot__cols wrap">
+    <div>
+      <p class="foot__t">Ayuda</p>
+      <ul>
+        <li><a href={wa} target="_blank" rel="noopener">Contacto</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+        <li><a href="#preguntas">Envíos y entregas</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="foot__t">Trabaja con nosotros</p>
+      <ul>
+        <li><a href={wa} target="_blank" rel="noopener">Venta al por mayor</a></li>
+        <li><a href="#eventos">Pedidos para eventos</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="foot__t">Intereses</p>
+      <ul>
+        <li><a href="#preguntas">Cuidado de las joyas</a></li>
+        <li><a href="#colecciones">Colecciones</a></li>
+        <li><a href="#regalos">Empaque de regalo</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="foot__t">Información</p>
+      <ul>
+        <li><a href="#preguntas">Cambios y devoluciones</a></li>
+        <li><a href="#inicio">Política de privacidad</a></li>
+        <li><a href="#inicio">Aviso legal</a></li>
+      </ul>
     </div>
   </div>
 
-  <div class="foot__links wrap">
-    <a href={config.instagram} target="_blank" rel="noopener"><Icon name="instagram-logo" weight="regular" />Instagram</a>
-    <a href={config.tiktok} target="_blank" rel="noopener"><Icon name="tiktok-logo" weight="regular" />TikTok</a>
-    <a href={wa} target="_blank" rel="noopener"><Icon name="whatsapp-logo" weight="regular" />WhatsApp</a>
-    <span><Icon name="truck" weight="regular" />Envíos a todo el Perú</span>
+  <div class="foot__social wrap">
+    <p class="foot__ship"><Icon name="truck" weight="light" /> Envíos a todo el Perú</p>
+    <div class="foot__icons">
+      <a href={config.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram-logo" weight="light" /></a>
+      <a href={config.tiktok} target="_blank" rel="noopener" aria-label="TikTok"><Icon name="tiktok-logo" weight="light" /></a>
+      <a href={wa} target="_blank" rel="noopener" aria-label="WhatsApp"><Icon name="whatsapp-logo" weight="light" /></a>
+    </div>
   </div>
 
-  <div class="foot__name" data-foot-name aria-hidden="true">
-    <span>Lemonel</span>
+  <div class="foot__name" aria-hidden="true" data-foot-name>
+    <span>LEMONEL</span>
   </div>
 
   <p class="foot__legal wrap">© {new Date().getFullYear()} Lemonel · {config.web}</p>
@@ -30,87 +77,188 @@ const wa = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent('Hola Lem
 
 <style>
   .foot {
-    padding-top: clamp(36px, 4.6vw, 64px);
-    background: var(--olive);
-    color: var(--cream);
+    background: var(--ivory);
+    color: var(--ink);
     overflow: hidden;
   }
 
-  .foot__cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: 32px;
+  .news {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(24px, 5vw, 80px);
+    align-items: center;
+    padding-block: var(--gap-section);
   }
 
-  .foot__lead {
-    max-width: 12ch;
-    font-family: var(--font-display);
-    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
-    font-size: clamp(2.6rem, 7vw, 7.6rem);
-    font-weight: 640;
-    letter-spacing: -0.035em;
-    line-height: 0.95;
-    text-wrap: balance;
+  .news__copy {
+    display: grid;
+    gap: 14px;
   }
 
-  .foot__actions {
+  .news__copy .script {
+    font-size: 1.3em;
+    line-height: 0.9;
+  }
+
+  .news__copy p:last-child {
+    max-width: 28rem;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  .news__form {
+    display: grid;
+    gap: 16px;
+  }
+
+  .news__row {
     display: flex;
-    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .news__row input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .check {
+    display: flex;
+    align-items: flex-start;
     gap: 12px;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    cursor: pointer;
   }
 
-  .foot__actions .btn--ghost:hover {
-    background: var(--cream);
-    color: var(--olive-night);
+  .check input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    accent-color: var(--olive);
   }
 
-  .foot__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 36px;
-    margin-top: clamp(24px, 3vw, 40px);
+  .news__msg {
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--sage);
+    font-size: 0.85rem;
+  }
+
+  .news__msg[hidden] {
+    display: none;
+  }
+
+  .foot__cols {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+    padding-block: clamp(36px, 4vw, 56px);
+    border-top: 1px solid var(--line);
+  }
+
+  .foot__t {
+    margin-bottom: 14px;
+    font-size: 0.6875rem;
     font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 
-  .foot__links a,
-  .foot__links span {
+  .foot__cols li a {
+    display: inline-block;
+    padding: 5px 0;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    transition: color 0.2s var(--ease);
+  }
+
+  .foot__cols li a:hover {
+    color: var(--olive);
+  }
+
+  .foot__social {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 28px;
+  }
+
+  .foot__ship {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.1rem;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
   }
 
-  .foot__links :global(.icon) {
-    font-size: 1.5rem;
+  .foot__ship :global(.icon) {
+    font-size: 1.4rem;
+    color: var(--olive);
   }
 
-  .foot__links a:hover {
-    color: var(--gold);
+  .foot__icons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .foot__icons a {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    font-size: 1.4rem;
+    transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
+  }
+
+  .foot__icons a:hover {
+    background: var(--olive);
+    border-color: var(--olive);
+    color: var(--white);
   }
 
   .foot__name {
-    margin-top: clamp(12px, 2vw, 28px);
-    padding-inline: var(--gutter);
+    padding-inline: var(--pad);
+    border-top: 1px solid var(--line);
     overflow: hidden;
   }
 
   .foot__name span {
     display: block;
+    padding-top: 12px;
     font-family: var(--font-display);
-    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
-    font-size: 27.4vw;
-    font-weight: 640;
-    letter-spacing: -0.05em;
-    line-height: 0.82;
-    color: var(--olive-deep);
+    font-size: 17.4vw;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    line-height: 0.92;
+    color: var(--olive);
     white-space: nowrap;
+    text-align: center;
     will-change: transform;
   }
 
   .foot__legal {
-    padding-block: 18px 28px;
-    font-size: 0.95rem;
+    padding-block: 14px 24px;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 860px) {
+    .news {
+      grid-template-columns: 1fr;
+    }
+
+    .foot__cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .news__row {
+      flex-direction: column;
+    }
   }
 </style>

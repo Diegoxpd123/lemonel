@@ -5,20 +5,15 @@ interface Props {
   class?: string
 }
 
-const { name, weight = 'regular', class: klass = '' } = Astro.props
+const { name, weight = 'light', class: klass = '' } = Astro.props
 
 const conSufijo = import.meta.glob(
-  '/node_modules/@phosphor-icons/core/assets/{light,bold,fill}/{gift,package,whatsapp-logo,instagram-logo,tiktok-logo,truck,plus,minus,x,arrow-right,arrow-up-right,calendar-blank,hand-heart,heart,flower,sun,diamond,watch,cross,pencil-simple,check,caret-down,shopping-bag-open,list,handbag,crown-simple,seal-check,chat-circle-dots}-{light,bold,fill}.svg',
-  { query: '?raw', import: 'default', eager: true },
-) as Record<string, string>
-
-const regulares = import.meta.glob(
-  '/node_modules/@phosphor-icons/core/assets/regular/{gift,package,whatsapp-logo,instagram-logo,tiktok-logo,truck,plus,minus,x,arrow-right,arrow-up-right,calendar-blank,hand-heart,heart,flower,sun,diamond,watch,cross,pencil-simple,check,caret-down,shopping-bag-open,list,handbag,crown-simple,seal-check,chat-circle-dots}.svg',
+  '/node_modules/@phosphor-icons/core/assets/{light,bold,fill}/{gift,package,whatsapp-logo,instagram-logo,tiktok-logo,pinterest-logo,truck,plus,minus,x,arrow-right,arrow-left,arrow-up-right,caret-right,caret-left,caret-down,calendar-blank,heart,magnifying-glass,user,handbag,list,trash,credit-card,seal-check,sparkle,check,hand-heart,shopping-bag,receipt,share-network}-{light,bold,fill}.svg',
   { query: '?raw', import: 'default', eager: true },
 ) as Record<string, string>
 
 const base = '/node_modules/@phosphor-icons/core/assets'
-const raw = weight === 'regular' ? (regulares[`${base}/regular/${name}.svg`] ?? '') : (conSufijo[`${base}/${weight}/${name}-${weight}.svg`] ?? '')
+const raw = conSufijo[`${base}/${weight}/${name}-${weight}.svg`] ?? ''
 const svg = raw.replace('<svg ', '<svg width="1em" height="1em" aria-hidden="true" focusable="false" ')
 ---
 
@@ -29,6 +24,7 @@ const svg = raw.replace('<svg ', '<svg width="1em" height="1em" aria-hidden="tru
     display: inline-flex;
     flex: none;
     width: 1em;
+    min-width: 1em;
     height: 1em;
     line-height: 0;
   }

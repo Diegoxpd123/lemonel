@@ -1,0 +1,77 @@
+---
+import Icon from './Icon.astro'
+import Tarjeta from './Tarjeta.astro'
+import type { Producto } from '../data/products'
+
+interface Props {
+  productos: Producto[]
+  titulo?: string
+  eyebrow?: string
+  verTodo?: { texto: string; filtro: string }
+  fondo?: string
+}
+
+const { productos, titulo, eyebrow, verTodo, fondo = 'var(--ivory)' } = Astro.props
+---
+
+<section class="fila" style={`background:${fondo}`}>
+  {
+    titulo && (
+      <div class="fila__head wrap" data-rv>
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        <h2 class="titulo">{titulo}</h2>
+      </div>
+    )
+  }
+  <div class="fila__grid wrap">
+    {productos.map((p) => <Tarjeta p={p} />)}
+  </div>
+  {
+    verTodo && (
+      <div class="fila__foot">
+        <a class="btn" href="#catalogo" data-filtro={verTodo.filtro}>
+          {verTodo.texto}
+          <Icon name="arrow-right" weight="light" />
+        </a>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .fila {
+    padding-block: clamp(32px, 4vw, 56px);
+  }
+
+  .fila__head {
+    display: grid;
+    gap: 8px;
+    margin-bottom: clamp(18px, 2vw, 28px);
+  }
+
+  .fila__grid {
+    --cols: 4;
+    --gap: clamp(8px, 1vw, 14px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--gap);
+    row-gap: clamp(24px, 3vw, 40px);
+  }
+
+  .fila__grid :global(.card) {
+    flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+  }
+
+  .fila__foot {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(28px, 3vw, 44px);
+  }
+
+  @media (max-width: 960px) {
+    .fila__grid {
+      --cols: 2;
+    }
+  }
+</style>

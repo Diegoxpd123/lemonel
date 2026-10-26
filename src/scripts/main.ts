@@ -1,11 +1,19 @@
-import { initCaja } from './caja'
-import { initCatalogo, initEvento, initHeader } from './ui'
+import { initHeader } from './header'
 import { initHero } from './hero'
-import { initMotion } from './motion'
+import { initCarrusel } from './carrusel'
+import { initCatalogo } from './catalogo'
+import { initCarrito } from './carrito'
+import { initProducto } from './producto'
+import { initEventos } from './eventos'
+import { initFaq, initMotion, initNews } from './motion'
 
 initHeader()
-initCatalogo()
-initEvento()
-initCaja()
 initHero()
+initCarrusel()
+initCatalogo()
+initCarrito()
+initProducto()
+initEventos()
+initFaq()
+initNews()
 initMotion()

@@ -1,6 +1,7 @@
 ---
-import '@fontsource-variable/fraunces/full.css'
-import '@fontsource-variable/dm-sans'
+import '@fontsource-variable/playfair-display'
+import '@fontsource-variable/montserrat'
+import '@fontsource/allura'
 import '../styles/global.css'
 
 interface Props {
@@ -18,12 +19,12 @@ const { title, description } = Astro.props
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#c8693f" />
+    <meta name="theme-color" content="#5b6446" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <script is:inline>document.documentElement.classList.add('js')</script>
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <script is:inline>document.documentElement.classList.add('js')</script>
   </head>
   <body>
     <slot />

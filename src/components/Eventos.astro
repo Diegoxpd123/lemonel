@@ -1,0 +1,411 @@
+---
+import Icon from './Icon.astro'
+import { productos } from '../data/products'
+import { config, escalas } from '../data/config'
+---
+
+<section class="evt" id="eventos" data-evento>
+  <div class="evt__intro wrap">
+    <div class="evt__copy" data-rv>
+      <p class="eyebrow">Para tus momentos especiales</p>
+      <h2 class="titulo">Que tu evento deje un <span class="script">lindo recuerdo</span></h2>
+      <p class="evt__lead">
+        Misas, bautizos, comuniones y matrimonios. Hace poco entregamos 70 collares de cruz para una misa, cada uno en su cajita y en un solo pedido.
+      </p>
+      <ul class="tiers" aria-label="Descuento por cantidad">
+        {
+          escalas.map((e) => (
+            <li class="tier" data-tier={e.desde}>
+              <span class="tier__n">{e.desde}+</span>
+              <span class="tier__d">{Math.round(e.descuento * 100)}% menos</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="evt__nota">
+        <Icon name="gift" weight="light" />
+        Pide con {config.diasAnticipacion} días de anticipación. Cada pieza va en su cajita.
+      </p>
+    </div>
+
+    <form class="calc" data-calc data-rv novalidate>
+      <h3 class="calc__title">Calcula tu pedido</h3>
+
+      <div class="calc__row">
+        <label for="calc-pieza">Pieza</label>
+        <select id="calc-pieza" name="pieza" data-calc-pieza>
+          {productos.map((p) => <option value={p.id} selected={p.id === 'collar-cruz'}>{p.nombre} — {config.moneda} {p.precio.toFixed(2)}</option>)}
+        </select>
+      </div>
+
+      <div class="calc__row">
+        <span class="calc__label" id="calc-cant-l">Cantidad</span>
+        <div class="calc__qty">
+          <button type="button" class="step" data-calc-menos aria-label="Una menos"><Icon name="minus" weight="light" /></button>
+          <input id="calc-cant" name="cantidad" type="number" inputmode="numeric" min="1" value="70" aria-labelledby="calc-cant-l" data-calc-cant />
+          <button type="button" class="step" data-calc-mas aria-label="Una más"><Icon name="plus" weight="light" /></button>
+        </div>
+        <div class="calc__presets" role="group" aria-label="Cantidades frecuentes">
+          {[10, 30, 50, 70, 100].map((n) => <button type="button" class="preset" data-calc-preset={n} aria-pressed="false">{n}</button>)}
+        </div>
+      </div>
+
+      <div class="calc__result" aria-live="polite">
+        <div>
+          <span>Cada una</span>
+          <strong data-calc-unit></strong>
+          <s data-calc-old></s>
+        </div>
+        <div>
+          <span>Total</span>
+          <strong data-calc-total></strong>
+          <em data-calc-save></em>
+        </div>
+      </div>
+
+      <div class="calc__grid">
+        <div class="calc__row">
+          <label for="calc-tipo">Tipo de evento</label>
+          <select id="calc-tipo" name="tipo" data-calc-tipo>
+            <option>Misa</option>
+            <option>Bautizo</option>
+            <option>Primera comunión</option>
+            <option>Matrimonio</option>
+            <option>Cumpleaños</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="calc__row">
+          <label for="calc-fecha">Fecha del evento</label>
+          <input id="calc-fecha" name="fecha" type="date" data-calc-fecha />
+        </div>
+      </div>
+
+      <div class="calc__row">
+        <label for="calc-nota">Personalización</label>
+        <input id="calc-nota" name="nota" type="text" placeholder="Nombre en la tarjeta, color del lazo…" data-calc-nota />
+      </div>
+
+      <p class="calc__error" data-calc-error role="alert" hidden></p>
+
+      <button class="btn calc__send" type="submit">
+        <Icon name="whatsapp-logo" weight="light" />
+        Pedir por WhatsApp
+      </button>
+    </form>
+  </div>
+</section>
+
+<style is:global>
+  .campo,
+  .calc select,
+  .calc input[type='text'],
+  .calc input[type='date'],
+  .calc input[type='number'],
+  .field select,
+  .field input,
+  .field textarea,
+  .news input[type='email'] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    min-height: 54px;
+    padding: 0 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background-color: var(--white);
+    color: var(--ink);
+    font-size: 0.95rem;
+    transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  }
+
+  .calc select:hover,
+  .calc input:hover,
+  .field select:hover,
+  .field input:hover,
+  .field textarea:hover,
+  .news input[type='email']:hover {
+    border-color: rgba(91, 100, 70, 0.55);
+  }
+
+  .calc select:focus,
+  .calc input:focus,
+  .field select:focus,
+  .field input:focus,
+  .field textarea:focus,
+  .news input[type='email']:focus {
+    outline: none;
+    border-color: var(--olive);
+    box-shadow: 0 0 0 4px rgba(201, 169, 106, 0.3);
+  }
+
+  .calc select,
+  .field select {
+    padding-right: 48px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%235b6446'><path d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 16px;
+    cursor: pointer;
+  }
+
+  .field textarea {
+    min-height: 88px;
+    padding: 14px 18px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .calc input::placeholder,
+  .field textarea::placeholder,
+  .news input::placeholder {
+    color: rgba(52, 56, 42, 0.45);
+  }
+</style>
+
+<style>
+  .evt {
+    padding-block: var(--gap-section);
+    background: var(--sage);
+  }
+
+  .evt__intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(24px, 5vw, 72px);
+    align-items: start;
+  }
+
+  .evt__copy {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+  }
+
+  .evt__copy .titulo {
+    font-size: clamp(2rem, 3.8vw, 3.4rem);
+  }
+
+  .evt__copy .script {
+    font-size: 1.3em;
+    line-height: 0.9;
+  }
+
+  .evt__lead {
+    max-width: 30rem;
+    font-size: 0.95rem;
+  }
+
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .tier {
+    display: grid;
+    gap: 2px;
+    padding: 16px 14px;
+    border-radius: 14px;
+    background: var(--white);
+    transition: background-color 0.3s var(--ease), color 0.3s var(--ease), transform 0.4s var(--ease-out);
+  }
+
+  .tier[data-active='true'] {
+    background: var(--olive);
+    color: var(--white);
+    transform: translateY(-4px);
+  }
+
+  .tier__n {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    line-height: 1;
+  }
+
+  .tier__d {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .evt__nota {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+  }
+
+  .evt__nota :global(.icon) {
+    font-size: 1.5rem;
+    color: var(--olive);
+  }
+
+  .calc {
+    display: grid;
+    gap: 18px;
+    padding: clamp(20px, 3vw, 36px);
+    border-radius: 22px;
+    background: var(--white);
+  }
+
+  .calc__title {
+    font-size: clamp(1.5rem, 2vw, 1.9rem);
+  }
+
+  .calc__row {
+    display: grid;
+    gap: 8px;
+  }
+
+  .calc label,
+  .calc__label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .calc__qty {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr) 54px;
+    gap: 8px;
+  }
+
+  .calc__qty input {
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .calc__qty input::-webkit-outer-spin-button,
+  .calc__qty input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .step {
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--white);
+    font-size: 1.3rem;
+    transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
+  }
+
+  .step:hover {
+    background: var(--olive);
+    color: var(--white);
+  }
+
+  .calc__presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .preset {
+    min-width: 54px;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
+  }
+
+  .preset:hover,
+  .preset[aria-pressed='true'] {
+    background: var(--olive);
+    border-color: var(--olive);
+    color: var(--white);
+  }
+
+  .calc__result {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 20px;
+    border-radius: 16px;
+    background: var(--ivory);
+  }
+
+  .calc__result > div {
+    display: grid;
+    gap: 2px;
+    align-content: start;
+  }
+
+  .calc__result span {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .calc__result strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--olive);
+  }
+
+  .calc__result s,
+  .calc__result em {
+    font-size: 0.8rem;
+    font-style: normal;
+    color: var(--ink-soft);
+  }
+
+  .calc__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .calc__error {
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--rose);
+    font-size: 0.85rem;
+  }
+
+  .calc__error[hidden] {
+    display: none;
+  }
+
+  .calc__send {
+    width: 100%;
+  }
+
+  .calc__send :global(.icon) {
+    font-size: 1.4em;
+  }
+
+  @media (max-width: 960px) {
+    .evt__intro {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .calc__grid,
+    .calc__result {
+      grid-template-columns: 1fr;
+    }
+
+    .tiers {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

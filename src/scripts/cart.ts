@@ -20,7 +20,8 @@ export interface Evento {
   fecha: string
 }
 
-const KEY = 'lemonel-caja'
+const KEY = 'lemonel-pedido'
+const FAV = 'lemonel-favoritos'
 const bus = new EventTarget()
 
 const leer = (): Linea[] => {
@@ -35,7 +36,18 @@ const leer = (): Linea[] => {
   }
 }
 
+const leerFav = (): string[] => {
+  try {
+    const raw = localStorage.getItem(FAV)
+    const data = raw ? JSON.parse(raw) : []
+    return Array.isArray(data) ? data.filter((id) => productos.some((p) => p.id === id)) : []
+  } catch {
+    return []
+  }
+}
+
 let lineas: Linea[] = leer()
+let favoritos: string[] = leerFav()
 
 const guardar = () => {
   try {
@@ -44,12 +56,20 @@ const guardar = () => {
   bus.dispatchEvent(new Event('change'))
 }
 
+const guardarFav = () => {
+  try {
+    localStorage.setItem(FAV, JSON.stringify(favoritos))
+  } catch {}
+  bus.dispatchEvent(new Event('fav'))
+}
+
 const redondear = (n: number) => Math.round(n * 100) / 100
 
 export const dinero = (n: number) =>
-  `${config.moneda} ${n.toLocaleString('es-PE', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })}`
+  `${config.moneda} ${n.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 export const onChange = (fn: () => void) => bus.addEventListener('change', fn)
+export const onFav = (fn: () => void) => bus.addEventListener('fav', fn)
 
 export const calcular = (p: Producto, qty: number): LineaCalc => {
   const descuento = descuentoPara(qty)
@@ -90,6 +110,16 @@ export const setQty = (id: string, qty: number) => {
 
 export const remove = (id: string) => setQty(id, 0)
 
+export const esFav = (id: string) => favoritos.includes(id)
+export const totalFav = () => favoritos.length
+export const getFav = () => [...favoritos]
+
+export const toggleFav = (id: string) => {
+  favoritos = favoritos.includes(id) ? favoritos.filter((x) => x !== id) : [...favoritos, id]
+  guardarFav()
+  return favoritos.includes(id)
+}
+
 export const fechaLegible = (iso: string) => {
   const [y, m, d] = iso.split('-')
   return y && m && d ? `${d}/${m}/${y}` : iso
@@ -101,7 +131,7 @@ export const urlWhatsapp = (ls: LineaCalc[], opts: { evento?: Evento | null; not
     const desc = l.descuento ? ` (${Math.round(l.descuento * 100)}% menos por cantidad)` : ''
     return `• ${l.qty} × ${l.p.nombre} — ${dinero(l.total)}${desc}`
   })
-  const partes = ['Hola Lemonel 🍋 Quiero armar mi caja:', '', ...filas, '', `Total: ${dinero(total)}`]
+  const partes = ['Hola Lemonel, quiero hacer este pedido:', '', ...filas, '', `Total: ${dinero(total)}`]
   if (opts.evento) {
     partes.push('', `Es para un evento: ${opts.evento.tipo}${opts.evento.fecha ? `, el ${fechaLegible(opts.evento.fecha)}` : ''}`)
   }

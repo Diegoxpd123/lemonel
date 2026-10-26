@@ -1,153 +1,94 @@
 ---
-import Icon from './Icon.astro'
-import { colecciones, productos } from '../data/products'
-
-const cuenta = (id: string) => productos.filter((p) => p.colecciones?.includes(id)).length
+import { colecciones } from '../data/products'
 ---
 
-<section class="cols" id="colecciones" data-colecciones>
-  {colecciones.map((c, i) => (
-    <article class={`col col--${c.tono} ${i % 2 ? 'col--flip' : ''}`} data-col-panel>
-      <div class="col__text wrap">
-        <h2 data-col-title>{c.nombre}</h2>
-        <p data-reveal>{c.frase}</p>
-        <button class="btn btn--cream" type="button" data-ver-col={c.id} data-nombre={c.nombre} data-reveal>
-          Ver las {cuenta(c.id)} piezas
-          <Icon name="arrow-right" weight="bold" />
-        </button>
-      </div>
-      <div class="col__art">
-        <div class="col__photo" data-col-piece>
+<section class="cols" id="colecciones">
+  <div class="cols__head wrap" data-rv>
+    <p class="eyebrow">Otras colecciones</p>
+    <h2 class="titulo">La misma esencia, otro estilo</h2>
+  </div>
+  <div class="cols__grid wrap">
+    {
+      colecciones.map((c) => (
+        <a class="tile" href="#catalogo" data-coleccion={c.id}>
           <img src={c.foto} alt="" width="900" height="1125" loading="lazy" decoding="async" />
-        </div>
-        <div class="col__photo col__photo--small" data-col-small>
-          <img src={c.foto2} alt="" width="900" height="1125" loading="lazy" decoding="async" />
-        </div>
-      </div>
-    </article>
-  ))}
+          <span class="tile__shade"></span>
+          <span class="tile__name">{c.nombre}</span>
+        </a>
+      ))
+    }
+    <a class="tile" href="#catalogo" data-filtro="todo">
+      <img src="/fotos/g-02.webp" alt="" width="800" height="1200" loading="lazy" decoding="async" />
+      <span class="tile__shade"></span>
+      <span class="tile__name">Todas las joyas</span>
+    </a>
+  </div>
 </section>
 
 <style>
-  .col {
+  .cols {
+    padding-block: var(--gap-section);
+    background: var(--white);
+  }
+
+  .cols__head {
+    display: grid;
+    gap: 8px;
+    margin-bottom: clamp(18px, 2vw, 28px);
+  }
+
+  .cols__grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: clamp(8px, 1vw, 14px);
+  }
+
+  .tile {
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
-    align-items: center;
-    min-height: min(64svh, 600px);
+    display: block;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
-    color: var(--ink);
+    background: var(--card);
+    color: var(--white);
   }
 
-  .col--flip .col__text {
-    order: 2;
-  }
-
-  .col--lilac {
-    background: var(--plum);
-  }
-
-  .col--sage {
-    background: var(--forest);
-  }
-
-  .col--blush {
-    background: var(--wine);
-  }
-
-  .col--sand {
-    background: var(--amber);
-  }
-
-  .col__text {
-    display: grid;
-    justify-items: start;
-    gap: 28px;
-    padding-block: clamp(28px, 4vw, 56px);
-  }
-
-  .col__text h2 {
-    font-size: clamp(3.4rem, 10.5vw, 11.4rem);
-    line-height: 0.88;
-  }
-
-  .col__text p {
-    max-width: 29rem;
-    font-family: var(--font-display);
-    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 48;
-    font-size: clamp(1.35rem, 2vw, 1.85rem);
-    font-weight: 480;
-    letter-spacing: -0.015em;
-    line-height: 1.25;
-  }
-
-  .col__art {
-    position: relative;
-    display: grid;
-    place-items: center;
-    align-self: stretch;
-    padding: clamp(16px, 2.4vw, 36px);
-  }
-
-  .col__photo {
-    width: min(100%, 400px);
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
-  }
-
-  .col__photo img {
+  .tile img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 1s var(--ease-out);
   }
 
-  .col__photo--small {
+  .tile:hover img {
+    transform: scale(1.06);
+  }
+
+  .tile__shade {
     position: absolute;
-    left: clamp(12px, 3vw, 48px);
-    bottom: clamp(24px, 4vw, 64px);
-    width: clamp(120px, 15vw, 220px);
-    border: 6px solid currentColor;
-    box-sizing: content-box;
-    color: inherit;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(40, 42, 30, 0.6) 0%, rgba(40, 42, 30, 0) 55%);
   }
 
-  .col--flip .col__photo--small {
-    left: auto;
-    right: clamp(12px, 3vw, 48px);
+  .tile__name {
+    position: absolute;
+    left: 20px;
+    right: 16px;
+    bottom: 18px;
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 1.8vw, 1.8rem);
+    line-height: 1.1;
   }
 
-  @media (max-width: 800px) {
-    .col,
-    .col--flip {
-      grid-template-columns: 1fr;
-      min-height: 0;
+  @media (max-width: 960px) {
+    .cols__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .col--flip .col__text {
-      order: 0;
-    }
-
-    .col__text {
-      padding-bottom: 12px;
-    }
-
-    .col__art {
-      padding: 12px var(--gutter) 56px;
-    }
-
-    .col__photo {
-      width: min(80%, 360px);
-    }
-
-    .col__photo--small {
-      left: auto;
-      right: calc(var(--gutter) + 4px);
-      bottom: 28px;
-      width: 34%;
-    }
-
-    .col--flip .col__photo--small {
-      right: calc(var(--gutter) + 4px);
+    .tile:last-child {
+      grid-column: 1 / -1;
+      aspect-ratio: 16 / 9;
     }
   }
 </style>

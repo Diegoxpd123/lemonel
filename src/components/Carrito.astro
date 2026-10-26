@@ -1,0 +1,428 @@
+---
+import Icon from './Icon.astro'
+---
+
+<div class="cveil" data-cveil hidden></div>
+
+<aside class="cart" data-cart role="dialog" aria-modal="true" aria-labelledby="cart-t" hidden>
+  <header class="cart__head">
+    <h2 id="cart-t">Tu carrito (<span data-cart-n>0</span>)</h2>
+    <button class="cart__close" type="button" aria-label="Cerrar carrito" data-cerrar-carrito>
+      <Icon name="x" weight="light" />
+    </button>
+  </header>
+
+  <div class="cart__scroll" data-cart-scroll>
+    <div class="cart__empty" data-cart-empty>
+      <Icon name="handbag" weight="light" />
+      <p>Tu carrito está vacío</p>
+      <span>Agrega tus joyas favoritas y las preparamos con cariño.</span>
+      <a class="btn" href="#catalogo" data-cerrar-carrito>
+        Ver joyas
+        <Icon name="arrow-right" weight="light" />
+      </a>
+    </div>
+
+    <ul class="cart__lines" data-cart-lines></ul>
+
+    <div class="cart__extra" data-cart-extra hidden>
+      <div class="cart__gift">
+        <Icon name="gift" weight="light" />
+        <div>
+          <p class="cart__gift-t">¿Es un regalo?</p>
+          <p class="cart__gift-s">Podemos incluir una nota especial en tu pedido.</p>
+        </div>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" data-evento-toggle />
+        <span>Es para un evento (misa, bautizo, matrimonio…)</span>
+      </label>
+
+      <div class="cart__evento" data-evento-fields hidden>
+        <div class="field">
+          <label for="cart-tipo">Tipo de evento</label>
+          <select id="cart-tipo" data-evento-tipo>
+            <option>Misa</option>
+            <option>Bautizo</option>
+            <option>Primera comunión</option>
+            <option>Matrimonio</option>
+            <option>Cumpleaños</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cart-fecha">Fecha del evento</label>
+          <input id="cart-fecha" type="date" data-evento-fecha />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="cart-nota">Nota para la tarjeta o el pedido</label>
+        <textarea id="cart-nota" rows="2" placeholder="Para quién es, un mensaje, color del lazo…" data-cart-nota></textarea>
+      </div>
+    </div>
+  </div>
+
+  <footer class="cart__foot">
+    <dl class="cart__sum">
+      <div>
+        <dt>Subtotal</dt>
+        <dd data-cart-sub>S/ 0.00</dd>
+      </div>
+      <div data-cart-ahorro-row hidden>
+        <dt>Descuento por cantidad</dt>
+        <dd data-cart-ahorro>S/ 0.00</dd>
+      </div>
+      <div>
+        <dt>Envío</dt>
+        <dd class="muted">Se coordina por WhatsApp</dd>
+      </div>
+      <div class="cart__total">
+        <dt>Total</dt>
+        <dd data-cart-total>S/ 0.00</dd>
+      </div>
+    </dl>
+    <button class="btn cart__send" type="button" data-enviar disabled>
+      <Icon name="whatsapp-logo" weight="light" />
+      Finalizar por WhatsApp
+    </button>
+  </footer>
+</aside>
+
+<style is:global>
+  .cveil {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(40, 42, 30, 0.45);
+  }
+
+  .cveil[hidden],
+  .cart[hidden] {
+    display: none;
+  }
+
+  .cart {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    width: min(480px, 100%);
+    background: var(--ivory);
+    color: var(--ink);
+  }
+
+  .cart__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 14px 14px 26px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cart__head h2 {
+    font-size: 1.5rem;
+  }
+
+  .cart__close {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    font-size: 1.6rem;
+    transition: background-color 0.25s var(--ease);
+  }
+
+  .cart__close:hover {
+    background: var(--cloud);
+  }
+
+  .cart__scroll {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px 26px 22px;
+  }
+
+  .cart__empty {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 56px 12px;
+    text-align: center;
+    font-size: 3.4rem;
+    color: var(--olive);
+  }
+
+  .cart__empty p {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--ink);
+  }
+
+  .cart__empty span {
+    max-width: 18rem;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  .cart__empty .btn {
+    margin-top: 14px;
+    font-size: 0.75rem;
+  }
+
+  .cart__empty[hidden],
+  .cart__extra[hidden],
+  .cart__evento[hidden],
+  [data-cart-ahorro-row][hidden] {
+    display: none;
+  }
+
+  .cart__lines {
+    display: grid;
+  }
+
+  .line {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr) auto;
+    gap: 4px 16px;
+    align-items: start;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .line__img {
+    grid-row: 1 / span 3;
+    width: 84px;
+    height: 104px;
+    object-fit: cover;
+    background: var(--card);
+  }
+
+  .line__name {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .line__price {
+    grid-column: 2;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .line__price s {
+    margin-right: 6px;
+    opacity: 0.7;
+  }
+
+  .line__tag {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--rose);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .line__qty {
+    grid-column: 2;
+    display: inline-grid;
+    grid-template-columns: 38px 44px 38px;
+    align-items: stretch;
+    width: max-content;
+    margin-top: 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .line__qty button {
+    display: grid;
+    place-items: center;
+    min-height: 40px;
+    border: 0;
+    background: transparent;
+    font-size: 1rem;
+    transition: background-color 0.2s var(--ease);
+  }
+
+  .line__qty button:hover {
+    background: var(--cloud);
+  }
+
+  .line__qty input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .line__qty input::-webkit-outer-spin-button,
+  .line__qty input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .line__rm {
+    grid-column: 3;
+    grid-row: 1;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    background: transparent;
+    font-size: 1.25rem;
+    color: var(--ink-soft);
+    transition: color 0.2s var(--ease);
+  }
+
+  .line__rm:hover {
+    color: var(--olive);
+  }
+
+  .cart__extra {
+    display: grid;
+    gap: 16px;
+    margin-top: 22px;
+  }
+
+  .cart__gift {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: var(--rose);
+    font-size: 1.9rem;
+    color: var(--olive);
+  }
+
+  .cart__gift-t {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .cart__gift-s {
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+
+  .cart__evento {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .field label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .cart__foot {
+    display: grid;
+    gap: 16px;
+    padding: 18px 26px 24px;
+    border-top: 1px solid var(--line);
+    background: var(--white);
+  }
+
+  .cart__sum {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .cart__sum div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.85rem;
+  }
+
+  .cart__sum dt {
+    color: var(--ink-soft);
+  }
+
+  .cart__sum dd {
+    margin: 0;
+  }
+
+  .cart__sum .muted {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+
+  .cart__total {
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 1rem !important;
+  }
+
+  .cart__total dt,
+  .cart__total dd {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    color: var(--ink);
+  }
+
+  .cart__send {
+    width: 100%;
+  }
+
+  .cart__send .icon {
+    font-size: 1.4em;
+  }
+
+  .cart__send:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .cart__lazo {
+    display: none;
+  }
+
+  @media (max-width: 520px) {
+    .cart__evento {
+      grid-template-columns: 1fr;
+    }
+
+    .line {
+      grid-template-columns: 72px minmax(0, 1fr) auto;
+    }
+
+    .line__img {
+      width: 72px;
+      height: 92px;
+    }
+  }
+</style>

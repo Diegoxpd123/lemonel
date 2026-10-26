@@ -1,0 +1,64 @@
+---
+import Icon from './Icon.astro'
+import { beneficios } from '../data/content'
+---
+
+<section class="ben" aria-label="Beneficios">
+  <ul class="ben__list wrap">
+    {
+      beneficios.map((b) => (
+        <li class="ben__item">
+          <Icon name={b.icono} weight="light" />
+          <span>{b.texto}</span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .ben {
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ben__list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding-block: 22px;
+  }
+
+  .ben__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+  }
+
+  .ben__item :global(.icon) {
+    font-size: 1.7rem;
+    color: var(--olive);
+  }
+
+  @media (max-width: 760px) {
+    .ben__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
+      padding-block: 16px;
+    }
+
+    .ben__item {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+      font-size: 0.625rem;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+    }
+  }
+</style>
