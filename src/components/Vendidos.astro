@@ -1,9 +1,10 @@
 ---
 import Icon from './Icon.astro'
 import Tarjeta from './Tarjeta.astro'
-import { productos } from '../data/products'
+import { getTienda } from '../data/api'
 
-const lista = productos.filter((p) => p.vendido)
+const tienda = await getTienda()
+const lista = tienda.productos.filter((p) => p.destacado)
 ---
 
 <section class="vend" id="vendidos">

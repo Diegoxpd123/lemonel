@@ -1,5 +1,8 @@
 ---
-import { preguntas } from '../data/content'
+import { getTienda } from '../data/api'
+
+const tienda = await getTienda()
+const preguntas = tienda.faqs.map((f) => ({ q: f.pregunta, a: f.respuesta }))
 ---
 
 <section class="faq" id="preguntas" data-faq>

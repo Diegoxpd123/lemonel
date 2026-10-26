@@ -1,7 +1,11 @@
 ---
 import Icon from './Icon.astro'
 import Tarjeta from './Tarjeta.astro'
-import { productos, categorias } from '../data/products'
+import { getTienda } from '../data/api'
+
+const tienda = await getTienda()
+const productos = tienda.productos
+const categorias = [{ slug: 'todo', nombre: 'Todo' }, ...tienda.categorias]
 ---
 
 <section class="cat" id="catalogo" data-catalogo>
@@ -15,7 +19,7 @@ import { productos, categorias } from '../data/products'
 
   <div class="cat__bar wrap">
     <div class="cat__chips" role="group" aria-label="Filtrar por categoría">
-      {categorias.map((c, i) => <button type="button" class="chip" data-chip={c.id} aria-pressed={i === 0 ? 'true' : 'false'}>{c.nombre}</button>)}
+      {categorias.map((c, i) => <button type="button" class="chip" data-chip={c.slug} aria-pressed={i === 0 ? 'true' : 'false'}>{c.nombre}</button>)}
       <button type="button" class="chip" data-chip="favoritos" aria-pressed="false">
         <Icon name="heart" weight="light" />
         Favoritos
@@ -29,6 +33,10 @@ import { productos, categorias } from '../data/products'
 
   <div class="cat__grid wrap" data-grid>
     {productos.map((p) => <Tarjeta p={p} />)}
+  </div>
+  <div class="cat__mas wrap">
+    <p class="cat__contador" data-contador aria-live="polite"></p>
+    <button class="btn btn--line" type="button" data-mas hidden>Ver más joyas</button>
   </div>
   <p class="cat__vacio wrap" data-vacio hidden>Aún no tienes favoritos. Toca el corazón en las joyas que te gusten.</p>
 </section>
@@ -135,6 +143,22 @@ import { productos, categorias } from '../data/products'
 
   .cat__grid :global(.card) {
     flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+  }
+
+  .cat__mas {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    margin-top: clamp(28px, 3vw, 44px);
+  }
+
+  .cat__mas [hidden] {
+    display: none;
+  }
+
+  .cat__contador {
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
   }
 
   .cat__vacio {

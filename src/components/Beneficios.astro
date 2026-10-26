@@ -1,6 +1,15 @@
 ---
 import Icon from './Icon.astro'
-import { beneficios } from '../data/content'
+import { getTienda } from '../data/api'
+import { dinero } from '../data/tienda'
+
+const tienda = await getTienda()
+const beneficios = [
+  { icono: 'truck', texto: 'Envíos a todo el Perú' },
+  { icono: 'hand-heart', texto: `Separa tu pedido con ${dinero(tienda.ajustes.envios.separar)}` },
+  { icono: 'gift', texto: 'Cada pieza en su cajita' },
+  { icono: 'heart', texto: 'Diseños atemporales' },
+]
 ---
 
 <section class="ben" aria-label="Beneficios">

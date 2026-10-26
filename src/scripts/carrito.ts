@@ -2,7 +2,7 @@ import gsap from 'gsap'
 import plus from '/node_modules/@phosphor-icons/core/assets/light/plus-light.svg?raw'
 import minus from '/node_modules/@phosphor-icons/core/assets/light/minus-light.svg?raw'
 import trash from '/node_modules/@phosphor-icons/core/assets/light/trash-light.svg?raw'
-import { dinero, getLineas, onChange, remove, resumen, setQty, urlWhatsapp } from './cart'
+import { dinero, onChange, remove, resumen, setQty, urlWhatsapp } from './cart'
 import { $, $$, reduce } from './util'
 
 const icono = (svg: string) => svg.replace('<svg ', '<svg width="1em" height="1em" aria-hidden="true" ')
@@ -34,30 +34,35 @@ export function initCarrito() {
   min.setDate(min.getDate() + 1)
   fecha.min = min.toISOString().slice(0, 10)
 
+  const esc = (t: string) => t.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
+
   const pintarLineas = () => {
     lines.innerHTML = ''
-    getLineas().forEach((l) => {
+    resumen().lineas.forEach((l) => {
       const li = document.createElement('li')
       li.className = 'line'
-      li.dataset.id = l.p.id
+      li.dataset.key = l.key
       const desc = l.descuento ? `<span class="line__tag">${Math.round(l.descuento * 100)}% menos</span>` : ''
-      const antes = l.descuento ? `<s>${dinero(l.p.precio)}</s>` : ''
+      const antes = l.descuento ? `<s>${dinero(l.v.precio)}</s>` : ''
+      const foto = l.p.fotos[0]?.sm ?? ''
+      const detalle = l.detalle.length ? `<span class="line__det">${esc(l.detalle.join(' · '))}</span>` : ''
+      const nombre = esc(l.p.nombre)
       li.innerHTML = `
-        <img class="line__img" src="${l.p.foto}" alt="" width="84" height="104" />
-        <span class="line__name">${l.p.nombre}</span>
-        <button type="button" class="line__rm" data-quitar aria-label="Quitar ${l.p.nombre}">${icono(trash)}</button>
+        <img class="line__img" src="${foto}" alt="" width="84" height="104" />
+        <span class="line__name">${nombre}${detalle}</span>
+        <button type="button" class="line__rm" data-quitar aria-label="Quitar ${nombre}">${icono(trash)}</button>
         <span class="line__price">${antes}${dinero(l.unit)}${desc}</span>
         <div class="line__qty">
-          <button type="button" data-menos aria-label="Una menos de ${l.p.nombre}">${icono(minus)}</button>
-          <input type="number" inputmode="numeric" min="1" value="${l.qty}" aria-label="Cantidad de ${l.p.nombre}" />
-          <button type="button" data-mas aria-label="Una más de ${l.p.nombre}">${icono(plus)}</button>
+          <button type="button" data-menos aria-label="Una menos de ${nombre}">${icono(minus)}</button>
+          <input type="number" inputmode="numeric" min="1" value="${l.qty}" aria-label="Cantidad de ${nombre}" />
+          <button type="button" data-mas aria-label="Una más de ${nombre}">${icono(plus)}</button>
         </div>
       `
       const input = li.querySelector('input') as HTMLInputElement
-      li.querySelector('[data-menos]')!.addEventListener('click', () => setQty(l.p.id, l.qty - 1))
-      li.querySelector('[data-mas]')!.addEventListener('click', () => setQty(l.p.id, l.qty + 1))
-      li.querySelector('[data-quitar]')!.addEventListener('click', () => remove(l.p.id))
-      input.addEventListener('change', () => setQty(l.p.id, Number(input.value)))
+      li.querySelector('[data-menos]')!.addEventListener('click', () => setQty(l.key, l.qty - 1))
+      li.querySelector('[data-mas]')!.addEventListener('click', () => setQty(l.key, l.qty + 1))
+      li.querySelector('[data-quitar]')!.addEventListener('click', () => remove(l.key))
+      input.addEventListener('change', () => setQty(l.key, Number(input.value)))
       lines.appendChild(li)
     })
   }

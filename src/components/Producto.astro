@@ -9,17 +9,26 @@ import Icon from './Icon.astro'
     <Icon name="x" weight="light" />
   </button>
   <div class="prod__gal">
-    <img data-prod-img-a src="" alt="" width="900" height="1125" />
-    <img data-prod-img-b src="" alt="" width="900" height="1125" />
+    <div class="prod__stage">
+      <img data-prod-img src="" alt="" width="900" height="1125" />
+    </div>
+    <ul class="prod__thumbs" data-prod-thumbs aria-label="Fotos del producto"></ul>
   </div>
   <div class="prod__info">
     <p class="eyebrow" data-prod-cat></p>
     <h2 id="prod-t" data-prod-name></h2>
     <p class="prod__price" data-prod-price></p>
+    <p class="prod__mat" data-prod-mat></p>
     <p class="prod__txt" data-prod-det></p>
-    <p class="prod__nota" data-prod-nota></p>
 
-    <div class="prod__qty">
+    <div class="prod__opts" data-prod-opts></div>
+
+    <div class="prod__diseno" data-prod-diseno hidden>
+      <label for="prod-diseno">¿Cuál de la foto te gusta?</label>
+      <textarea id="prod-diseno" rows="2" maxlength="160" placeholder="Cuéntanos el modelo o describe el que quieres" data-prod-diseno-txt></textarea>
+    </div>
+
+    <div class="prod__qty" data-prod-qty>
       <span>Cantidad</span>
       <div class="prod__step">
         <button type="button" aria-label="Una menos" data-prod-menos><Icon name="minus" weight="light" /></button>
@@ -28,10 +37,16 @@ import Icon from './Icon.astro'
       </div>
     </div>
 
+    <p class="prod__error" data-prod-error role="alert" hidden></p>
+
     <button class="btn prod__add" type="button" data-prod-add>
-      <span>Agregar al carrito</span>
+      <span data-prod-add-t>Agregar al carrito</span>
       <Icon name="arrow-right" weight="light" />
     </button>
+    <a class="btn btn--line prod__consulta" data-prod-consulta target="_blank" rel="noopener" hidden>
+      <Icon name="whatsapp-logo" weight="light" />
+      <span>Consultar por WhatsApp</span>
+    </a>
     <button class="prod__fav" type="button" data-prod-fav>
       <Icon name="heart" weight="light" />
       <span data-prod-fav-t>Agregar a favoritos</span>
@@ -39,8 +54,8 @@ import Icon from './Icon.astro'
 
     <ul class="prod__ben">
       <li><Icon name="truck" weight="light" /> Envíos a todo el Perú</li>
-      <li><Icon name="credit-card" weight="light" /> Pagos seguros</li>
-      <li><Icon name="gift" weight="light" /> Empaque especial</li>
+      <li><Icon name="gift" weight="light" /> Cada pieza va en su cajita</li>
+      <li><Icon name="hand-heart" weight="light" /> Separa tu pedido y completa el pago después</li>
     </ul>
   </div>
 </div>
@@ -65,6 +80,7 @@ import Icon from './Icon.astro'
     left: 50%;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     width: min(1040px, calc(100% - 32px));
     max-height: calc(100svh - 32px);
     transform: translate(-50%, -50%);
@@ -94,28 +110,64 @@ import Icon from './Icon.astro'
   }
 
   .prod__gal {
-    position: relative;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
     min-height: 420px;
     background: var(--card);
   }
 
-  .prod__gal img {
+  .prod__stage {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .prod__stage img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: opacity 0.5s var(--ease);
+    transition: opacity 0.35s var(--ease);
   }
 
-  .prod__gal img + img {
-    opacity: 0;
+  .prod__thumbs {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--ivory);
   }
 
-  @media (hover: hover) {
-    .prod__gal:hover img + img {
-      opacity: 1;
-    }
+  .prod__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .prod__thumbs:empty {
+    display: none;
+  }
+
+  .prod__thumb {
+    flex: none;
+    width: 60px;
+    height: 74px;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: var(--cloud);
+    overflow: hidden;
+    transition: border-color 0.2s var(--ease);
+  }
+
+  .prod__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .prod__thumb[aria-current='true'] {
+    border-color: var(--olive);
   }
 
   .prod__info {
@@ -139,11 +191,152 @@ import Icon from './Icon.astro'
     color: var(--ink-soft);
   }
 
-  .prod__nota {
-    font-family: var(--font-script);
-    font-size: 1.7rem;
-    line-height: 1;
+  .prod__mat {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--olive);
+  }
+
+  .prod__opts {
+    display: grid;
+    gap: 16px;
+  }
+
+  .opt {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .opt legend {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 0;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .opt legend b {
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.08em;
+  }
+
+  .opt__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .opt__chips--letras {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    gap: 6px;
+  }
+
+  .opt__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    font-size: 0.8125rem;
+    transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+
+  .opt__chips--letras .opt__chip {
+    padding: 0;
+    border-radius: 10px;
+  }
+
+  .opt__chip:hover:not(:disabled) {
+    border-color: var(--olive);
+  }
+
+  .opt__chip[aria-pressed='true'] {
+    border-color: var(--olive);
+    background: var(--olive);
+    color: var(--white);
+  }
+
+  .opt__chip:disabled {
+    opacity: 0.45;
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+
+  .opt__chip small {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .opt__dot {
+    width: 14px;
+    height: 14px;
+    border: 1px solid rgba(52, 56, 42, 0.3);
+    border-radius: 50%;
+  }
+
+  .opt--error legend {
+    color: #a63d40;
+  }
+
+  .opt--error .opt__chip {
+    border-color: #a63d40;
+  }
+
+  .prod__diseno {
+    display: grid;
+    gap: 8px;
+  }
+
+  .prod__diseno label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .prod__diseno textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--white);
+    resize: vertical;
+  }
+
+  .prod__error {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #f3dcdc;
+    color: #8c2f32;
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .prod__error[hidden],
+  .prod__consulta[hidden],
+  .prod__diseno[hidden],
+  .prod__qty[hidden] {
+    display: none;
+  }
+
+  .prod__consulta {
+    width: 100%;
   }
 
   .prod__qty {
@@ -250,14 +443,18 @@ import Icon from './Icon.astro'
       width: 100%;
       max-height: 94svh;
       grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: auto auto;
       transform: none;
       border-radius: 24px 24px 0 0;
       overflow-y: auto;
     }
 
     .prod__gal {
+      display: block;
       min-height: 0;
+    }
+
+    .prod__stage {
       aspect-ratio: 1;
     }
 

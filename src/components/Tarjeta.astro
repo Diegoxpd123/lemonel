@@ -1,39 +1,46 @@
 ---
 import Icon from './Icon.astro'
-import { etiquetas, type Producto } from '../data/products'
-import { config } from '../data/config'
+import { dinero, etiquetaDe, necesitaElegir, tieneVariantes, type Producto } from '../data/tienda'
 
 interface Props {
   p: Producto
   carrusel?: boolean
+  prioridad?: boolean
 }
 
-const { p, carrusel = false } = Astro.props
-const precio = `${config.moneda} ${p.precio.toFixed(2)}`
-const antes = p.antes ? `${config.moneda} ${p.antes.toFixed(2)}` : ''
+const { p, carrusel = false, prioridad = false } = Astro.props
+const precio = dinero(p.precioDesde)
+const etiqueta = etiquetaDe(p)
+const elegir = necesitaElegir(p)
+const principal = p.fotos[0]
+const segunda = p.fotos[1]
 ---
 
-<article class={`card ${carrusel ? 'card--slide' : ''}`} data-card data-id={p.id} data-cat={p.categoria} data-col={p.colecciones.join(' ')}>
+<article class={`card ${carrusel ? 'card--slide' : ''}${p.agotado ? ' card--agotado' : ''}`} data-card data-id={p.id} data-cat={p.categoria} data-col={p.colecciones.join(' ')}>
   <div class="card__media">
     <button class="card__open" type="button" data-abrir-producto={p.id} aria-label={`Ver ${p.nombre}`}>
-      <img class="card__img card__img--a" src={p.foto} alt={p.alt} width="900" height="1125" loading="lazy" decoding="async" />
-      <img class="card__img card__img--b" src={p.foto2} alt="" width="900" height="1125" loading="lazy" decoding="async" />
+      {principal && <img class="card__img card__img--a" src={principal.sm} alt={p.nombre} width="640" height={Math.round((640 * principal.alto) / Math.max(principal.ancho, 1))} loading={prioridad ? 'eager' : 'lazy'} decoding="async" />}
+      {segunda && <img class="card__img card__img--b" src={segunda.sm} alt="" width="640" height="800" loading="lazy" decoding="async" />}
     </button>
     <button class="card__fav" type="button" aria-label={`Guardar ${p.nombre} en favoritos`} aria-pressed="false" data-fav={p.id}>
       <Icon name="heart" weight="light" class="i-off" />
       <Icon name="heart" weight="fill" class="i-on" />
     </button>
-    {p.etiqueta && <span class={`tag tag--${p.etiqueta}`}>{etiquetas[p.etiqueta]}</span>}
-    <button class="card__add" type="button" data-add={p.id}>
-      <Icon name="plus" weight="light" />
-      <span>Agregar</span>
-    </button>
+    {etiqueta && <span class={`tag tag--${etiqueta.id}`}>{etiqueta.texto}</span>}
+    {
+      p.agotado ? null : (
+        <button class="card__add" type="button" data-add={p.id} data-elegir={elegir ? 'si' : 'no'} aria-label={elegir ? `Elegir opciones de ${p.nombre}` : `Agregar ${p.nombre} al carrito`}>
+          <Icon name="plus" weight="light" />
+          <span>{elegir ? 'Elegir' : 'Agregar'}</span>
+        </button>
+      )
+    }
   </div>
   <div class="card__info">
     <h3 class="card__name">{p.nombre}</h3>
     <p class="card__price">
+      {tieneVariantes(p) && <span class="card__desde">Desde</span>}
       {precio}
-      {antes && <s>{antes}</s>}
     </p>
   </div>
 </article>
@@ -147,8 +154,24 @@ const antes = p.antes ? `${config.moneda} ${p.antes.toFixed(2)}` : ''
     background: var(--rose);
   }
 
-  .tag--limitado {
-    background: var(--cloud);
+  .tag--agotado {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .card--agotado .card__img {
+    opacity: 0.62;
+  }
+
+  .card--agotado:hover .card__img--b {
+    opacity: 0.62;
+  }
+
+  .card__desde {
+    margin-right: 6px;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .card__add {
@@ -216,11 +239,6 @@ const antes = p.antes ? `${config.moneda} ${p.antes.toFixed(2)}` : ''
     margin-top: 4px;
     font-size: 0.8125rem;
     color: var(--ink-soft);
-  }
-
-  .card__price s {
-    margin-left: 8px;
-    opacity: 0.7;
   }
 
   @media (max-width: 760px) {

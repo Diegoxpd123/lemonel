@@ -1,10 +1,14 @@
 ---
 import Icon from './Icon.astro'
+import { getTienda } from '../data/api'
 
-const slides = [
+const tienda = await getTienda()
+const respaldo = [
   { video: '/video/hero-1.mp4', poster: '/video/hero-1.webp' },
   { video: '/video/hero-2.mp4', poster: '/video/hero-2.webp' },
 ]
+const propios = tienda.ajustes.hero.filter((h) => h.video)
+const slides = propios.length ? propios.map((h) => ({ video: h.video!, poster: h.poster ?? undefined })) : respaldo
 ---
 
 <section class="hero" id="inicio" data-hero>

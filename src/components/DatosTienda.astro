@@ -1,0 +1,12 @@
+---
+import { compactar, jsonSeguro, type Tienda } from '../data/tienda'
+
+interface Props {
+  tienda: Tienda
+}
+
+const { tienda } = Astro.props
+const json = jsonSeguro(compactar(tienda))
+---
+
+<script type="application/json" id="lemonel-data" set:html={json}></script>

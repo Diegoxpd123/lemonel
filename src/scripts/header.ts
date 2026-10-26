@@ -1,8 +1,11 @@
 import gsap from 'gsap'
-import { productos } from '../data/products'
-import { config } from '../data/config'
+import { dinero } from '../data/tienda'
+import { productos } from './store'
 import { $, $$, reduce, irA } from './util'
 import { getFav, onFav, totalFav } from './cart'
+
+const norm = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+const esc = (t: string) => t.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 
 export function initHeader() {
   const head = $('[data-header]')
@@ -123,7 +126,7 @@ export function initHeader() {
   const pintar = (q: string) => {
     if (!resultados) return
     const t = q.trim().toLowerCase()
-    const lista = t ? productos.filter((p) => (p.nombre + ' ' + p.categoria + ' ' + p.nota).toLowerCase().includes(t)) : productos.filter((p) => p.vendido)
+    const lista = (t ? productos.filter((p) => norm(`${p.nombre} ${p.categoria} ${p.material}`).includes(norm(t))) : productos.filter((p) => p.destacado)).slice(0, 12)
     resultados.innerHTML = ''
     if (!lista.length) {
       const li = document.createElement('li')
@@ -135,7 +138,7 @@ export function initHeader() {
     }
     lista.forEach((p) => {
       const li = document.createElement('li')
-      li.innerHTML = `<button type="button" class="busca__item" data-abrir-producto="${p.id}"><img src="${p.foto}" alt="" width="150" height="188" loading="lazy" /><span>${p.nombre}</span><small>${config.moneda} ${p.precio.toFixed(2)}</small></button>`
+      li.innerHTML = `<button type="button" class="busca__item" data-abrir-producto="${p.id}"><img src="${p.fotos[0]?.sm ?? ''}" alt="" width="150" height="188" loading="lazy" /><span>${esc(p.nombre)}</span><small>${dinero(p.precioDesde)}</small></button>`
       resultados.appendChild(li)
     })
   }

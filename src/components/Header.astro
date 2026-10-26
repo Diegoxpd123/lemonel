@@ -1,16 +1,12 @@
 ---
 import Icon from './Icon.astro'
 import { navegacion } from '../data/content'
-import { config } from '../data/config'
-import { colecciones } from '../data/products'
+import { getTienda } from '../data/api'
 
-const tipos = [
-  { id: 'collares', nombre: 'Collares' },
-  { id: 'aretes', nombre: 'Aretes' },
-  { id: 'anillos', nombre: 'Anillos' },
-  { id: 'pulseras', nombre: 'Pulseras' },
-  { id: 'relojes', nombre: 'Relojes' },
-]
+const tienda = await getTienda()
+const colecciones = tienda.colecciones
+const tipos = tienda.categorias.map((c) => ({ id: c.slug, nombre: c.nombre }))
+const whatsapp = tienda.ajustes.contacto.whatsapp
 ---
 
 <header class="head" data-header data-state="top">
@@ -68,7 +64,7 @@ const tipos = [
         <div class="mega__col">
           <p class="mega__t">Colecciones</p>
           <ul>
-            {colecciones.map((c) => <li><a href="#catalogo" data-coleccion={c.id}>{c.nombre}</a></li>)}
+            {colecciones.map((c) => <li><a href="#catalogo" data-coleccion={c.slug}>{c.nombre}</a></li>)}
           </ul>
         </div>
         <div class="mega__col">
@@ -122,13 +118,13 @@ const tipos = [
       <ul class="menu__list">
         <li><a href="#catalogo" data-menu-link data-filtro="todo">Todas las joyas</a></li>
         {tipos.map((t) => <li><a href="#catalogo" data-menu-link data-filtro={t.id}>{t.nombre}</a></li>)}
-        {colecciones.map((c) => <li><a href="#catalogo" data-menu-link data-coleccion={c.id}>{c.nombre}</a></li>)}
+        {colecciones.map((c) => <li><a href="#catalogo" data-menu-link data-coleccion={c.slug}>{c.nombre}</a></li>)}
       </ul>
     </div>
 
     <div class="menu__foot">
       <div class="menu__row">
-        <a href={`https://wa.me/${config.whatsapp}`} target="_blank" rel="noopener">WhatsApp</a>
+        <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener">WhatsApp</a>
         <button type="button" data-ver-favoritos data-menu-link>Favoritos</button>
       </div>
       <button class="menu__search" type="button" data-abrir-busqueda>

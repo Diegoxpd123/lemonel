@@ -1,5 +1,8 @@
 ---
-import { colecciones } from '../data/products'
+import { getTienda } from '../data/api'
+
+const tienda = await getTienda()
+const colecciones = tienda.colecciones.filter((c) => c.foto)
 ---
 
 <section class="cols" id="colecciones">
@@ -10,15 +13,15 @@ import { colecciones } from '../data/products'
   <div class="cols__grid wrap">
     {
       colecciones.map((c) => (
-        <a class="tile" href="#catalogo" data-coleccion={c.id}>
-          <img src={c.foto} alt="" width="900" height="1125" loading="lazy" decoding="async" />
+        <a class="tile" href="#catalogo" data-coleccion={c.slug}>
+          <img src={c.foto!} alt="" width="900" height="1125" loading="lazy" decoding="async" />
           <span class="tile__shade"></span>
           <span class="tile__name">{c.nombre}</span>
         </a>
       ))
     }
     <a class="tile" href="#catalogo" data-filtro="todo">
-      <img src="/fotos/g-02.webp" alt="" width="800" height="1200" loading="lazy" decoding="async" />
+      <img src="/fotos/todas.webp" alt="" width="800" height="1200" loading="lazy" decoding="async" />
       <span class="tile__shade"></span>
       <span class="tile__name">Todas las joyas</span>
     </a>
@@ -39,7 +42,7 @@ import { colecciones } from '../data/products'
 
   .cols__grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: clamp(8px, 1vw, 14px);
   }
 
@@ -86,7 +89,7 @@ import { colecciones } from '../data/products'
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .tile:last-child {
+    .tile:last-child:nth-child(odd) {
       grid-column: 1 / -1;
       aspect-ratio: 16 / 9;
     }

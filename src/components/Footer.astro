@@ -1,8 +1,12 @@
 ---
 import Icon from './Icon.astro'
-import { config } from '../data/config'
+import { getTienda } from '../data/api'
 
-const wa = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent('Hola Lemonel, quiero hacerles una consulta.')}`
+const tienda = await getTienda()
+const contacto = tienda.ajustes.contacto
+const wa = `https://wa.me/${contacto.whatsapp}?text=${encodeURIComponent('Hola Lemonel, quiero hacerles una consulta.')}`
+const instagram = `https://www.instagram.com/${contacto.instagram}`
+const tiktok = `https://www.tiktok.com/@${contacto.tiktok}`
 ---
 
 <footer class="foot">
@@ -10,7 +14,7 @@ const wa = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent('Hola Lem
     <div class="news__copy" data-rv>
       <p class="eyebrow">Únete al círculo Lemonel</p>
       <h2 class="titulo" id="news-t">Más que joyas, <span class="script">historias tuyas.</span></h2>
-      <p>Suscríbete y recibe 10% de descuento en tu primer pedido, además de novedades y regalos para momentos reales.</p>
+      <p>Suscríbete y recibe novedades, lanzamientos y regalos para momentos reales.</p>
     </div>
     <form class="news__form" data-news novalidate>
       <div class="news__row">
@@ -62,8 +66,8 @@ const wa = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent('Hola Lem
   <div class="foot__social wrap">
     <p class="foot__ship"><Icon name="truck" weight="light" /> Envíos a todo el Perú</p>
     <div class="foot__icons">
-      <a href={config.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram-logo" weight="light" /></a>
-      <a href={config.tiktok} target="_blank" rel="noopener" aria-label="TikTok"><Icon name="tiktok-logo" weight="light" /></a>
+      <a href={instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram-logo" weight="light" /></a>
+      <a href={tiktok} target="_blank" rel="noopener" aria-label="TikTok"><Icon name="tiktok-logo" weight="light" /></a>
       <a href={wa} target="_blank" rel="noopener" aria-label="WhatsApp"><Icon name="whatsapp-logo" weight="light" /></a>
     </div>
   </div>
@@ -72,7 +76,7 @@ const wa = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent('Hola Lem
     <span>LEMONEL</span>
   </div>
 
-  <p class="foot__legal wrap">© {new Date().getFullYear()} Lemonel · {config.web}</p>
+  <p class="foot__legal wrap">© {new Date().getFullYear()} Lemonel · lemonel.pe</p>
 </footer>
 
 <style>

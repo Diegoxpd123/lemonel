@@ -1,7 +1,19 @@
 ---
 import Icon from './Icon.astro'
-import { productos } from '../data/products'
-import { config, escalas } from '../data/config'
+import { dinero } from '../data/tienda'
+import { getTienda } from '../data/api'
+
+const tienda = await getTienda()
+const escalas = [...tienda.ajustes.descuentos].sort((a, b) => a.desde - b.desde)
+const dias = tienda.ajustes.evento.diasAnticipacion
+const grupos = tienda.categorias
+  .map((c) => ({
+    nombre: c.nombre,
+    items: tienda.productos
+      .filter((p) => p.categoria === c.slug && !p.agotado)
+      .flatMap((p) => p.variantes.filter((v) => !v.agotado).map((v, vi) => ({ valor: `${p.id}:${vi}`, texto: `${p.nombre}${p.variantes.length > 1 ? ` · ${v.tipo}` : ''} — ${dinero(v.precio)}`, inicial: p.slug === 'collares-de-cruz' }))),
+  }))
+  .filter((g) => g.items.length)
 ---
 
 <section class="evt" id="eventos" data-evento>
@@ -17,14 +29,14 @@ import { config, escalas } from '../data/config'
           escalas.map((e) => (
             <li class="tier" data-tier={e.desde}>
               <span class="tier__n">{e.desde}+</span>
-              <span class="tier__d">{Math.round(e.descuento * 100)}% menos</span>
+              <span class="tier__d">{Math.round(e.porcentaje)}% menos</span>
             </li>
           ))
         }
       </ul>
       <p class="evt__nota">
         <Icon name="gift" weight="light" />
-        Pide con {config.diasAnticipacion} días de anticipación. Cada pieza va en su cajita.
+        Pide con {dias} días de anticipación. Cada pieza va en su cajita.
       </p>
     </div>
 
@@ -34,7 +46,17 @@ import { config, escalas } from '../data/config'
       <div class="calc__row">
         <label for="calc-pieza">Pieza</label>
         <select id="calc-pieza" name="pieza" data-calc-pieza>
-          {productos.map((p) => <option value={p.id} selected={p.id === 'collar-cruz'}>{p.nombre} — {config.moneda} {p.precio.toFixed(2)}</option>)}
+          {
+            grupos.map((g) => (
+              <optgroup label={g.nombre}>
+                {g.items.map((i) => (
+                  <option value={i.valor} selected={i.inicial}>
+                    {i.texto}
+                  </option>
+                ))}
+              </optgroup>
+            ))
+          }
         </select>
       </div>
 
