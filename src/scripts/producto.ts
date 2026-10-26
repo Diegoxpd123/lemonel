@@ -149,8 +149,14 @@ export function initProducto() {
       fs.appendChild(leg)
       const cont = document.createElement('div')
       cont.className = `opt__chips${o.valores.length >= LETRAS_MIN ? ' opt__chips--letras' : ''}`
+      const sin = o.agotados ?? []
       const botones = o.valores.map((val) => {
         const b = chip(val, '', colores[val] ?? '')
+        if (sin.includes(val)) {
+          b.disabled = true
+          b.title = `${val} (agotado)`
+          b.setAttribute('aria-label', `${val}, agotado`)
+        }
         b.addEventListener('click', () => {
           op[o.nombre] = val
           botones.forEach((x, k) => x.setAttribute('aria-pressed', String(o.valores[k] === val)))
@@ -163,9 +169,12 @@ export function initProducto() {
       })
       fs.appendChild(cont)
       if (!o.requerida) {
-        op[o.nombre] = o.valores[0]!
-        botones[0]?.setAttribute('aria-pressed', 'true')
-        sel.textContent = o.valores[0]!
+        const k = o.valores.findIndex((val) => !sin.includes(val))
+        if (k >= 0) {
+          op[o.nombre] = o.valores[k]!
+          botones[k]?.setAttribute('aria-pressed', 'true')
+          sel.textContent = o.valores[k]!
+        }
       }
       opts.appendChild(fs)
     })

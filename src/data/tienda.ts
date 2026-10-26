@@ -16,8 +16,11 @@ export interface Variante {
 export interface Opcion {
   nombre: string
   valores: string[]
+  agotados: string[]
   requerida: boolean
 }
+
+export const disponibles = (o: Opcion) => o.valores.filter((v) => !(o.agotados ?? []).includes(v))
 
 export interface Producto {
   id: number

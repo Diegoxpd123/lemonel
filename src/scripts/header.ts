@@ -208,7 +208,7 @@ export function initHeader() {
       d.hidden = n === 0
     })
     $$('[data-fav]').forEach((b) => {
-      const on = getFav().includes(b.dataset.fav!)
+      const on = getFav().includes(Number(b.dataset.fav))
       b.setAttribute('aria-pressed', String(on))
     })
   }

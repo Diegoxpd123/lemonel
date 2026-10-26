@@ -1,4 +1,4 @@
-import { dinero, type Producto, type Variante } from '../data/tienda'
+import { dinero, disponibles, type Producto, type Variante } from '../data/tienda'
 import { descuentoPara, porId, productos, whatsapp } from './store'
 
 export interface Linea {
@@ -39,8 +39,8 @@ export const claveDe = (l: Pick<Linea, 'id' | 'vi' | 'op' | 'dis'>) =>
 
 const valida = (l: Linea) => {
   const p = porId(l.id)
-  if (!p || !p.variantes[l.vi] || !(Number(l.qty) > 0)) return false
-  return Object.entries(l.op ?? {}).every(([k, v]) => p.opciones.some((o) => o.nombre === k && o.valores.includes(v)))
+  if (!p || p.agotado || !p.variantes[l.vi] || p.variantes[l.vi]!.agotado || !(Number(l.qty) > 0)) return false
+  return Object.entries(l.op ?? {}).every(([k, v]) => p.opciones.some((o) => o.nombre === k && disponibles(o).includes(v)))
 }
 
 const leer = (): Linea[] => {
@@ -154,7 +154,10 @@ export const toggleFav = (id: number) => {
 
 export const opcionesPorDefecto = (p: Producto) => {
   const op: Record<string, string> = {}
-  for (const o of p.opciones) if (!o.requerida && o.valores.length) op[o.nombre] = o.valores[0]!
+  for (const o of p.opciones) {
+    const libres = disponibles(o)
+    if (!o.requerida && libres.length) op[o.nombre] = libres[0]!
+  }
   return op
 }
 
