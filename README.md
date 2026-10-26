@@ -30,3 +30,8 @@ Aplicación con el `Dockerfile` (puerto 4321). Variable de ejecución:
 | Variable | Ejemplo |
 | --- | --- |
 | `API_URL` | `https://lemonel-api.tupaginazo.com` |
+
+## Seguimiento de pedidos
+
+- `/pedido/<token>`: página pública (SSR, `noindex`) con la cadena de estados del pedido. Consulta `GET /api/public/pedido/:token` de la API.
+- `/api/pedido` (POST): proxy hacia `POST /api/public/pedidos`. El carrito lo usa al pulsar “Finalizar por WhatsApp” para crear el pedido y poner su número y su link en el mensaje. Si falla, el mensaje se envía igual, sin link.
