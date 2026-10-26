@@ -166,7 +166,7 @@ export const fechaLegible = (iso: string) => {
   return y && m && d ? `${d}/${m}/${y}` : iso
 }
 
-export const urlWhatsapp = (ls: LineaCalc[], opts: { evento?: Evento | null; nota?: string } = {}) => {
+export const urlWhatsapp = (ls: LineaCalc[], opts: { evento?: Evento | null; nota?: string; pedido?: { codigo: string; url: string } | null } = {}) => {
   const total = redondear(ls.reduce((a, l) => a + l.total, 0))
   const filas = ls.map((l) => {
     const desc = l.descuento ? ` (${Math.round(l.descuento * 100)}% menos por cantidad)` : ''
@@ -179,6 +179,7 @@ export const urlWhatsapp = (ls: LineaCalc[], opts: { evento?: Evento | null; not
     partes.push('', `Es para un evento: ${opts.evento.tipo}${opts.evento.fecha ? `, el ${fechaLegible(opts.evento.fecha)}` : ''}`)
   }
   if (opts.nota && opts.nota.trim()) partes.push('', `Nota: ${opts.nota.trim()}`)
+  if (opts.pedido) partes.push('', `Pedido N° ${opts.pedido.codigo}`, `Sigue tu pedido aquí: ${opts.pedido.url}`)
   partes.push('', '¿Me confirman disponibilidad y envío?')
   return `https://wa.me/${whatsapp()}?text=${encodeURIComponent(partes.join('\n'))}`
 }

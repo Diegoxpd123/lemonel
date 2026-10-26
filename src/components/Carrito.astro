@@ -87,6 +87,7 @@ import Icon from './Icon.astro'
       <Icon name="whatsapp-logo" weight="light" />
       Finalizar por WhatsApp
     </button>
+    <p class="cart__seguir">Al finalizar recibes un link para seguir el estado de tu pedido.</p>
   </footer>
 </aside>
 
@@ -415,6 +416,19 @@ import Icon from './Icon.astro'
   .cart__send:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+
+  .cart__send[aria-busy='true'] {
+    opacity: 0.75;
+    cursor: progress;
+  }
+
+  .cart__seguir {
+    margin: 10px 0 0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--ink-soft);
   }
 
   .cart__lazo {

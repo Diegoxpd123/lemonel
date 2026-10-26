@@ -1,0 +1,673 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Icon from '../../components/Icon.astro'
+
+export const prerender = false
+
+interface Pedido {
+  codigo: string
+  estado: 'recibido' | 'pagado' | 'preparando' | 'enviado' | 'entregado'
+  indice: number
+  cancelado: boolean
+  motivoCancelacion: string
+  cliente: string
+  ciudad: string
+  actualizado: string
+  pasos: { estado: string; hecho: boolean; fecha: string | null }[]
+  mensajes: { estado: string; nota: string; fecha: string }[]
+  envio: { metodo: string; agencia: string; seguimiento: string }
+  items: { nombre: string; detalle: string; cantidad: number; foto: string | null; subtotal: number }[]
+  montos: { subtotal: number; descuento: number; envio: number; total: number; pagado: number; saldo: number }
+  tienda: { whatsapp: string; dias: string; horasCambio: number }
+}
+
+const base = (process.env.API_URL ?? import.meta.env.API_URL ?? 'http://localhost:50002').replace(/\/$/, '')
+const { token } = Astro.params
+
+let pedido: Pedido | null = null
+let fallo = false
+
+if (token && /^[A-Za-z0-9_-]{10,40}$/.test(token)) {
+  try {
+    const ip = Astro.request.headers.get('cf-connecting-ip') ?? Astro.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? ''
+    const res = await fetch(`${base}/api/public/pedido/${token}`, {
+      headers: { Accept: 'application/json', ...(ip ? { 'x-forwarded-for': ip } : {}) },
+      signal: AbortSignal.timeout(6000),
+    })
+    if (res.ok) pedido = (await res.json()) as Pedido
+    else if (res.status !== 404) fallo = true
+  } catch {
+    fallo = true
+  }
+}
+
+Astro.response.headers.set('Cache-Control', 'no-store')
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+if (!pedido) Astro.response.status = fallo ? 503 : 404
+
+const dinero = (n: number) => `S/ ${n.toFixed(2)}`
+const cuando = (iso: string) =>
+  new Date(iso).toLocaleString('es-PE', { timeZone: 'America/Lima', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
+const dia = (iso: string) => new Date(iso).toLocaleDateString('es-PE', { timeZone: 'America/Lima', day: 'numeric', month: 'short' })
+
+const m = pedido?.montos
+const separado = !!m && m.pagado > 0 && m.saldo > 0
+const pagoConfirmado = !!m && m.pagado > 0 && m.saldo <= 0
+const via = pedido?.envio.metodo === 'shalom' ? 'Shalom' : pedido?.envio.metodo === 'motorizado' ? 'motorizado de Lemonel' : 'nuestro courier'
+const dias = (pedido?.tienda.dias ?? '').toLowerCase()
+
+const titulos = ['Pedido recibido', separado ? 'Pieza separada' : 'Pago confirmado', 'Preparando tu pedido', 'Enviado', 'Entregado']
+
+const frase = () => {
+  if (!pedido || !m) return ''
+  switch (pedido.estado) {
+    case 'recibido':
+      return 'Recibimos tu pedido. En cuanto confirmemos tu pago, avanzamos al siguiente paso.'
+    case 'pagado':
+      return separado ? `Tu pieza quedó separada. Para completar tu pedido te faltan ${dinero(m.saldo)}.` : '¡Pago confirmado! Pronto empezamos a preparar tu pedido.'
+    case 'preparando':
+      return `Estamos armando tu pedido con cariño${dias ? `. Enviamos ${dias}` : ''}.`
+    case 'enviado':
+      return pedido.envio.metodo === 'motorizado' ? 'Tu pedido va en camino con nuestro motorizado.' : `Tu pedido va en camino por ${via}${pedido.envio.agencia ? ` hacia ${pedido.envio.agencia}` : ''}.`
+    default:
+      return `¡Tu pedido llegó! Gracias por elegir Lemonel.${pedido.tienda.horasCambio > 0 ? ` Si necesitas un cambio, escríbenos dentro de las ${pedido.tienda.horasCambio} horas.` : ''}`
+  }
+}
+
+const detallePaso = (i: number) => {
+  if (!pedido) return ''
+  if (i === 3) {
+    if (pedido.envio.metodo === 'motorizado') return 'Entrega con motorizado.'
+    return [pedido.envio.metodo ? `Envío por ${via}` : '', pedido.envio.agencia].filter(Boolean).join(' · ')
+  }
+  return ''
+}
+
+const hasta = pedido ? pedido.indice / (pedido.pasos.length - 1) : 0
+const wa = pedido ? `https://wa.me/${pedido.tienda.whatsapp}?text=${encodeURIComponent(`Hola Lemonel, consulto por mi pedido ${pedido.codigo}.`)}` : ''
+const titulo = pedido ? `Tu pedido ${pedido.codigo} · Lemonel` : 'Seguimiento de pedido · Lemonel'
+---
+
+<Layout title={titulo} description="Sigue el estado de tu pedido de Lemonel." noindex>
+  <header class="top">
+    <a href="/" aria-label="Ir a la tienda Lemonel"><img src="/logo.webp" alt="Lemonel" width="64" height="64" /></a>
+  </header>
+
+  <main class="seg" data-seg>
+    {
+      pedido ? (
+        <>
+          <section class="hero" data-entra>
+            <p class="eyebrow">Seguimiento · Pedido {pedido.codigo}</p>
+            <h1>
+              {pedido.cliente ? <>Hola, <span class="script">{pedido.cliente}</span></> : 'Tu pedido'}
+            </h1>
+            {pedido.cancelado ? (
+              <div class="cancelado" role="status">
+                <strong>Este pedido fue cancelado.</strong>
+                {pedido.motivoCancelacion && <span>{pedido.motivoCancelacion}</span>}
+              </div>
+            ) : (
+              <p class="frase">{frase()}</p>
+            )}
+            <p class="actualizado">Actualizado el {cuando(pedido.actualizado)}</p>
+          </section>
+
+          {
+            !pedido.cancelado && (
+              <section class="card cadena-card" data-entra aria-labelledby="t-cadena">
+                <h2 id="t-cadena" class="card__t">Estado de tu pedido</h2>
+                <div class="cadena-wrap">
+                  <div class="cadena__linea" aria-hidden="true">
+                    <span class="cadena__progreso" data-progreso data-hasta={hasta} style={`transform: scaleY(${hasta})`} />
+                  </div>
+                  <ol class="cadena">
+                    {pedido.pasos.map((p, i) => (
+                      <li class={`paso${p.hecho ? ' paso--hecho' : ''}${i === pedido.indice ? ' paso--actual' : ''}`} aria-current={i === pedido.indice ? 'step' : undefined}>
+                        <span class="perla" data-perla aria-hidden="true">
+                          {i === pedido.indice && i < pedido.pasos.length - 1 && <span class="perla__halo" data-halo />}
+                          {p.hecho && (
+                            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M4.5 10.5l3.6 3.6 7.4-8" />
+                            </svg>
+                          )}
+                        </span>
+                        <div class="paso__texto">
+                          <p class="paso__t">
+                            {titulos[i]}
+                            <span class="solo-lector">{i === pedido.indice ? ' (paso actual)' : p.hecho ? ' (completado)' : ' (pendiente)'}</span>
+                          </p>
+                          {p.hecho && p.fecha && <p class="paso__f">{dia(p.fecha)}</p>}
+                          {p.hecho && detallePaso(i) && <p class="paso__d">{detallePaso(i)}</p>}
+                          {i === 3 && p.hecho && pedido.envio.seguimiento && (
+                            <p class="codigo">
+                              <span>Código de seguimiento</span>
+                              <strong>{pedido.envio.seguimiento}</strong>
+                              <button type="button" class="copiar" data-copiar={pedido.envio.seguimiento}>
+                                Copiar
+                              </button>
+                            </p>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </section>
+            )
+          }
+
+          {
+            pedido.mensajes.length > 0 && (
+              <section class="card" data-entra aria-labelledby="t-msj">
+                <h2 id="t-msj" class="card__t">Mensajes de Lemonel</h2>
+                <ul class="mensajes">
+                  {pedido.mensajes.map((x) => (
+                    <li>
+                      <p>{x.nota}</p>
+                      <span>{cuando(x.fecha)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )
+          }
+
+          <section class="card" data-entra aria-labelledby="t-res">
+            <h2 id="t-res" class="card__t">Tu pedido</h2>
+            <ul class="items">
+              {pedido.items.map((i) => (
+                <li>
+                  {i.foto ? <img src={i.foto} alt="" width="64" height="80" loading="lazy" /> : <span class="items__vacio" aria-hidden="true" />}
+                  <div>
+                    <p class="items__n">{i.nombre}</p>
+                    {i.detalle && <p class="items__d">{i.detalle}</p>}
+                    <p class="items__d">Cantidad: {i.cantidad}</p>
+                  </div>
+                  <p class="items__p">{dinero(i.subtotal)}</p>
+                </li>
+              ))}
+            </ul>
+            <dl class="montos">
+              {m && m.descuento > 0 && (
+                <>
+                  <div><dt>Subtotal</dt><dd>{dinero(m.subtotal)}</dd></div>
+                  <div><dt>Descuento</dt><dd>− {dinero(m.descuento)}</dd></div>
+                </>
+              )}
+              {m && m.envio > 0 && <div><dt>Envío</dt><dd>{dinero(m.envio)}</dd></div>}
+              <div class="montos__total"><dt>Total</dt><dd>{m && dinero(m.total)}</dd></div>
+            </dl>
+            <p class={`pago${pagoConfirmado ? ' pago--ok' : separado ? ' pago--parcial' : ''}`}>
+              {pagoConfirmado ? '✓ Pago confirmado' : separado ? `Separado con ${dinero(m!.pagado)} · te faltan ${dinero(m!.saldo)}` : 'Pago pendiente de confirmar'}
+            </p>
+          </section>
+
+          <section class="ayuda" data-entra>
+            <p>¿Tienes alguna duda sobre tu pedido?</p>
+            <a class="btn" href={wa} target="_blank" rel="noopener">
+              <Icon name="whatsapp-logo" weight="light" />
+              Escríbenos por WhatsApp
+            </a>
+            <button type="button" class="refrescar" data-refrescar>Actualizar estado</button>
+          </section>
+        </>
+      ) : (
+        <section class="vacio" data-entra>
+          <p class="eyebrow">{fallo ? 'Un momento' : 'Seguimiento de pedido'}</p>
+          <h1>{fallo ? 'No pudimos cargar tu pedido' : 'No encontramos este pedido'}</h1>
+          <p class="frase">
+            {fallo
+              ? 'Tuvimos un problema para consultar el estado. Inténtalo de nuevo en unos minutos.'
+              : 'Revisa que el link esté completo, tal como te lo enviamos por WhatsApp. Si el problema sigue, escríbenos.'}
+          </p>
+          <a class="btn" href="/">Ir a la tienda</a>
+        </section>
+      )
+    }
+  </main>
+
+  <footer class="pie">
+    <p>Lemonel · Más que joyas, <span class="script">historias tuyas.</span></p>
+    <a href="/">Volver a la tienda</a>
+  </footer>
+
+  <script>
+    import gsap from 'gsap'
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const raiz = document.querySelector<HTMLElement>('[data-seg]')
+
+    if (raiz && !reduce) {
+      const progreso = raiz.querySelector<HTMLElement>('[data-progreso]')
+      const perlas = Array.from(raiz.querySelectorAll('[data-perla]'))
+      const halo = raiz.querySelector('[data-halo]')
+      const hasta = Number(progreso?.dataset.hasta ?? 0)
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      tl.from(raiz.querySelectorAll('[data-entra]'), { y: 24, autoAlpha: 0, duration: 0.7, stagger: 0.1, clearProps: 'transform,opacity,visibility' })
+      if (progreso) tl.fromTo(progreso, { scaleY: 0 }, { scaleY: hasta, duration: 1.2, ease: 'power2.inOut' }, 0.35)
+      if (perlas.length) tl.from(perlas, { scale: 0.4, autoAlpha: 0, duration: 0.55, stagger: 0.14, ease: 'back.out(2.4)' }, 0.4)
+      if (halo) gsap.fromTo(halo, { scale: 1, autoAlpha: 0.6 }, { scale: 1.7, autoAlpha: 0, duration: 1.9, repeat: -1, ease: 'power1.out', delay: 1.4 })
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-copiar]').forEach((b) => {
+      b.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(b.dataset.copiar ?? '')
+          b.textContent = 'Copiado'
+        } catch {
+          b.textContent = 'Selecciónalo y copia'
+        }
+        window.setTimeout(() => (b.textContent = 'Copiar'), 2200)
+      })
+    })
+
+    document.querySelector('[data-refrescar]')?.addEventListener('click', () => window.location.reload())
+
+    const abierta = Date.now()
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && Date.now() - abierta > 60_000) window.location.reload()
+    })
+  </script>
+</Layout>
+
+<style>
+  .top {
+    display: flex;
+    justify-content: center;
+    padding: 22px var(--pad) 6px;
+  }
+
+  .top img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+  }
+
+  .seg {
+    display: grid;
+    gap: 18px;
+    width: min(100% - 2 * var(--pad), 720px);
+    margin: 0 auto;
+    padding: 18px 0 56px;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 18px 0 8px;
+  }
+
+  .eyebrow {
+    margin: 0 0 10px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--olive);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 7vw, 3.4rem);
+    line-height: 1.08;
+    color: var(--ink);
+  }
+
+  .script {
+    font-family: var(--font-script);
+    font-size: 1.18em;
+    color: var(--olive);
+  }
+
+  .frase {
+    max-width: 34em;
+    margin: 14px auto 0;
+    font-size: 1.0625rem;
+    color: var(--ink-soft);
+  }
+
+  .actualizado {
+    margin: 12px 0 0;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+  }
+
+  .cancelado {
+    display: grid;
+    gap: 4px;
+    max-width: 34em;
+    margin: 16px auto 0;
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    background: var(--rose);
+    color: #7a3a36;
+  }
+
+  .card {
+    padding: clamp(20px, 4vw, 30px);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--white);
+  }
+
+  .card__t {
+    margin: 0 0 18px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.35rem;
+  }
+
+  .cadena-wrap {
+    position: relative;
+  }
+
+  .cadena__linea {
+    position: absolute;
+    left: 19px;
+    top: 20px;
+    bottom: 34px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--cloud);
+  }
+
+  .cadena__progreso {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--olive), var(--gold));
+    transform-origin: top;
+  }
+
+  .cadena {
+    position: relative;
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .paso {
+    position: relative;
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 18px;
+    padding-bottom: 30px;
+  }
+
+  .paso:last-child {
+    padding-bottom: 0;
+  }
+
+  .perla {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1.5px solid var(--sand);
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #fff 0%, var(--cloud) 58%, #d8cfc2 100%);
+    box-shadow: inset 0 -3px 6px rgba(52, 56, 42, 0.08);
+    color: #fff;
+  }
+
+  .paso--hecho .perla {
+    border-color: var(--olive-dk);
+    background: radial-gradient(circle at 32% 28%, #9aa57f 0%, var(--olive) 60%, var(--olive-dk) 100%);
+  }
+
+  .paso--actual .perla {
+    box-shadow:
+      0 0 0 5px rgba(201, 169, 106, 0.3),
+      inset 0 -3px 6px rgba(52, 56, 42, 0.12);
+  }
+
+  .perla__halo {
+    position: absolute;
+    inset: -4px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .paso__texto {
+    padding-top: 6px;
+  }
+
+  .paso__t {
+    margin: 0;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .paso--hecho .paso__t {
+    color: var(--ink);
+  }
+
+  .paso--actual .paso__t {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    line-height: 1.2;
+  }
+
+  .paso__f,
+  .paso__d {
+    margin: 2px 0 0;
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  .codigo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 10px 0 0;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--card);
+    font-size: 0.8125rem;
+  }
+
+  .codigo span {
+    color: var(--ink-soft);
+  }
+
+  .codigo strong {
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    word-break: break-all;
+  }
+
+  .copiar,
+  .refrescar {
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--olive);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--olive);
+    font-family: var(--font-text);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .copiar:hover,
+  .refrescar:hover {
+    background: var(--olive);
+    color: var(--white);
+  }
+
+  .mensajes {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mensajes li {
+    padding: 12px 16px;
+    border-left: 3px solid var(--gold);
+    border-radius: 4px 12px 12px 4px;
+    background: var(--card);
+  }
+
+  .mensajes p {
+    margin: 0;
+  }
+
+  .mensajes span {
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+  }
+
+  .items {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .items li {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .items img,
+  .items__vacio {
+    width: 64px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: var(--card);
+  }
+
+  .items__n {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .items__d {
+    margin: 2px 0 0;
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  .items__p {
+    margin: 0;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .montos {
+    display: grid;
+    gap: 8px;
+    margin: 20px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  .montos div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .montos dt,
+  .montos dd {
+    margin: 0;
+  }
+
+  .montos__total {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+  }
+
+  .pago {
+    margin: 14px 0 0;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--card);
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .pago--ok {
+    background: rgba(91, 100, 70, 0.14);
+    color: var(--olive-dk);
+  }
+
+  .pago--parcial {
+    background: rgba(201, 169, 106, 0.22);
+    color: #7a5f2a;
+  }
+
+  .ayuda {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    padding: 12px 0 0;
+    text-align: center;
+  }
+
+  .ayuda p {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  .vacio {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    padding: 56px 0;
+    text-align: center;
+  }
+
+  .pie {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 28px var(--pad) 40px;
+    border-top: 1px solid var(--line);
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  .pie p {
+    margin: 0;
+  }
+
+  .pie a {
+    color: var(--olive);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .solo-lector {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cadena__progreso {
+      transition: none;
+    }
+  }
+</style>

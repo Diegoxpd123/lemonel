@@ -3,7 +3,9 @@ import plus from '/node_modules/@phosphor-icons/core/assets/light/plus-light.svg
 import minus from '/node_modules/@phosphor-icons/core/assets/light/minus-light.svg?raw'
 import trash from '/node_modules/@phosphor-icons/core/assets/light/trash-light.svg?raw'
 import { dinero, onChange, remove, resumen, setQty, urlWhatsapp } from './cart'
-import { $, $$, reduce } from './util'
+import { $, $$, reduce, toast } from './util'
+
+const ULTIMO = 'lemonel-ultimo-pedido'
 
 const icono = (svg: string) => svg.replace('<svg ', '<svg width="1em" height="1em" aria-hidden="true" ')
 
@@ -128,19 +130,66 @@ export function initCarrito() {
   })
   fecha.addEventListener('input', () => fecha.setCustomValidity(''))
 
-  send.addEventListener('click', () => {
+  const registrar = async (lineas: ReturnType<typeof resumen>['lineas'], evento: { tipo: string; fecha: string } | null, texto: string) => {
+    const huella = JSON.stringify([lineas.map((l) => [l.l.id, l.l.vi, l.l.op, l.l.dis, l.qty]), texto, evento])
+    try {
+      const previo = JSON.parse(localStorage.getItem(ULTIMO) ?? 'null') as { huella: string; codigo: string; url: string; hasta: number } | null
+      if (previo && previo.huella === huella && previo.hasta > Date.now()) return { codigo: previo.codigo, url: previo.url }
+    } catch {
+      localStorage.removeItem(ULTIMO)
+    }
+    const res = await fetch('/api/pedido', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: lineas.map((l) => ({ id: l.l.id, vi: l.l.vi, op: l.l.op, dis: l.l.dis, qty: l.qty })), nota: texto, evento }),
+    })
+    const datos = (await res.json().catch(() => ({}))) as { codigo?: string; ruta?: string; error?: string }
+    if (res.status === 400) throw new Error(datos.error ?? 'Revisa tu pedido')
+    if (!res.ok || !datos.codigo || !datos.ruta) return null
+    const pedido = { codigo: datos.codigo, url: `${location.origin}${datos.ruta}` }
+    try {
+      localStorage.setItem(ULTIMO, JSON.stringify({ huella, ...pedido, hasta: Date.now() + 6 * 3600 * 1000 }))
+    } catch {
+      return pedido
+    }
+    return pedido
+  }
+
+  send.addEventListener('click', async () => {
     const r = resumen()
-    if (!r.piezas) return
+    if (!r.piezas || send.getAttribute('aria-busy') === 'true') return
     if (toggle.checked && !fecha.value) {
       fecha.setCustomValidity('Elige la fecha de tu evento')
       fecha.reportValidity()
       return
     }
-    const url = urlWhatsapp(r.lineas, {
-      evento: toggle.checked ? { tipo: tipo.value, fecha: fecha.value } : null,
-      nota: nota.value,
-    })
-    window.open(url, '_blank', 'noopener')
+    const evento = toggle.checked ? { tipo: tipo.value, fecha: fecha.value } : null
+    const ventana = window.open('', '_blank')
+    send.setAttribute('aria-busy', 'true')
+    send.disabled = true
+    const etiqueta = send.lastChild
+    const textoOriginal = etiqueta?.textContent ?? ''
+    if (etiqueta) etiqueta.textContent = ' Preparando tu pedido…'
+    let pedido: { codigo: string; url: string } | null = null
+    try {
+      pedido = await registrar(r.lineas, evento, nota.value)
+    } catch (e) {
+      ventana?.close()
+      toast((e as Error).message)
+      return
+    } finally {
+      send.removeAttribute('aria-busy')
+      send.disabled = resumen().piezas === 0
+      if (etiqueta) etiqueta.textContent = textoOriginal
+    }
+    const url = urlWhatsapp(r.lineas, { evento, nota: nota.value, pedido })
+    if (ventana) {
+      ventana.opener = null
+      ventana.location.href = url
+    } else {
+      window.location.href = url
+    }
+    if (pedido) toast(`Pedido ${pedido.codigo} registrado. Guarda tu link de seguimiento.`)
   })
 
   onChange(pintar)
